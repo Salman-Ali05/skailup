@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye } from '@fortawesome/free-solid-svg-icons';
+import PageNameWhite from '../components/PageNameWhite';
 
 const LoginPage = () => {
   return (
@@ -41,8 +42,9 @@ const LoginPage = () => {
 
             <input type="password" className="inputs" placeholder="Mot de passe" />
 
-          </div>
+            <a href="/#" className="forgot-password">Mot de passe oublié</a>
 
+          </div>
 
           <button type="submit" className="buttons-primary">Se connecter</button>
 
@@ -50,8 +52,9 @@ const LoginPage = () => {
 
       </div>
 
-      <div className='name-form'>
+      <div className='app-name-form'>
 
+        <PageNameWhite />
 
       </div>
 

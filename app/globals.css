@@ -41,7 +41,10 @@ body {
   border-radius: 10px;
   border: 1px solid #dedede;
   margin-top: 5px;
-
+}
+.inputs:focus {
+  outline: none;
+  border: 1px solid #1B43D0;
 }
 
 .buttons-primary {
@@ -65,9 +68,15 @@ body {
   width: 20px;
   height: 20px;
 }
-
 .icons-gray-light {
   color: #9a9d9c;
+}
+
+/* APP NAMES */
+.app-name-white {
+  font-size: 24px;
+  font-weight: 600;
+  color: #fff;
 }
 
 /* LOGIN */
@@ -88,15 +97,17 @@ body {
   display: flex;
   flex-direction: column;
 }
-
 .form-group label {
   width: fit-content;
 }
 
-.name-form {
+.app-name-form {
   width: 50%;
   height: 100vh;
   background-color: #333333;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .log-sub-title {
@@ -114,8 +125,20 @@ body {
   display: flex;
   align-items: center;
   color: #9a9d9c;
+  cursor: pointer;
 }
-
 .reveal-password span {
   margin-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-self: center;
+}
+
+.forgot-password{
+  margin-top: 5px;
+  font-size: 14px;
+  color: #9a9d9c;
+}
+.forgot-password:hover{
+  text-decoration: underline;
 }
