@@ -13,7 +13,7 @@ const LoginPage = () => {
 
     const onSubmit = (e) => {
         e.preventDefault();
-        router.push('/str_home');
+        router.push('/structures/str_home');
     };
 
     return (
