@@ -1,6 +1,7 @@
-.connection-form {
+.register-form {
     display: flex;
     width: 50%;
+    flex-direction: column;
     height: 100vh;
     justify-content: center;
     align-items: center;
@@ -13,6 +14,7 @@
   .form-group {
     display: flex;
     flex-direction: column;
+    margin-top: 20px;
   }
   .form-group label {
     width: fit-content;
@@ -27,7 +29,7 @@
     align-items: center;
   }
   
-  .log-sub-title {
+  .sub-title {
     text-align: center;
     color: #252525;
   }
