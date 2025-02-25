@@ -1,0 +1,76 @@
+.connection-form {
+    display: flex;
+    width: 50%;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .forms>div {
+    margin-bottom: 20px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .form-group label {
+    width: fit-content;
+  }
+  
+  .app-name-form {
+    width: 50%;
+    height: 100vh;
+    background-color: #333333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .log-sub-title {
+    text-align: center;
+    color: #252525;
+  }
+  
+  .password-label-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .reveal-password {
+    display: flex;
+    align-items: center;
+    color: #9a9d9c;
+    cursor: pointer;
+    font-size: 13px;
+  }
+  .reveal-password span {
+    margin-right: 5px;
+    display: flex;
+    align-items: center;
+    justify-self: center;
+  }
+  
+  .forgot-password{
+    margin-top: 5px;
+    font-size: 13px;
+    color: #9a9d9c;
+  }
+  .forgot-password:hover{
+    text-decoration: underline;
+  }
+  
+  .shuffle-form {
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .shuffle-form:hover {
+    text-decoration: underline;
+  }
+  
+  .shuffle-form a {
+    color : #1b97d0;
+  }
