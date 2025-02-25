@@ -23,20 +23,27 @@ const RegisterPage = () => {
                     <h2 className={styles["sub-title"]}>Inscription</h2>
 
                     <div className={styles["form-group"]}>
+                        <label>Type de profil</label>
+                        <select className="inputs" name="type">
+                            <option value="Structure">Structure</option>
+                            <option value="Intervenant">Intervenant</option>
+                            <option value="Projet">Projet</option>
+                        </select>
+                    </div>
+
+                    <div className={styles["form-group"]}>
                         <label>Email</label>
                         <input type="email" className="inputs" placeholder="Email" name="email" />
                     </div>
 
                     <div className={styles["form-group"]}>
-                        <div className={styles["password-label-container"]}>
-                            <label>Mot de passe</label>
-                            <div className={styles["reveal-password"]}>
-                                <span><p>Afficher</p></span>
-                                <span><FontAwesomeIcon icon={faEye} className={styles["icons icons-gray-light"]} /></span>
-                            </div>
-                        </div>
+                        <label>Mot de passe</label>
                         <input type="password" className="inputs" placeholder="Mot de passe" />
-                        <a href="/#" className={styles["forgot-password"]}>Mot de passe oublié</a>
+                    </div>
+
+                    <div className={styles["form-group"]}>
+                        <label>Confirmation du mot de passe</label>
+                        <input type="password" className="inputs" placeholder="Mot de passe" />
                     </div>
 
                     <button type="submit" className="buttons-primary">S'inscrire</button>
