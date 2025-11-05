@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PageNameWhite from '../components/PageNameWhite';
+import PageNameWhite from '../components/AppName';
 import styles from "./register.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';

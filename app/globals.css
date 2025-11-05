@@ -1,5 +1,4 @@
-/* GLOBAL */
-
+/* GLOBAL RESET */
 * {
   box-sizing: border-box;
   padding: 0;
@@ -17,63 +16,21 @@ body {
   color: #252525;
 }
 
-.container {
+/* LAYOUT STRUCTURE */
+.layout-wrapper {
   display: flex;
-  flex-wrap: wrap;
+  height: 100vh;
+  width: 100vw;
 }
 
-.forms {
-  background-color: #FFFF;
+.layout-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  width: 50%;
-  justify-content: center;
-  border-radius: 24px;
-  padding: 20px 20px 23px 23px;
 }
 
-.inputs {
-  padding: 6px 12px 6px 12px;
-  height: 44px;
-  color: #252525;
-  background-color: #FFFF;
-  border-radius: 10px;
-  border: 1px solid #dedede;
-  margin-top: 5px;
-}
-.inputs:focus {
-  outline: none;
-  border: 1px solid #1B43D0;
-}
-
-.buttons-primary {
-  background-color: #1B43D0;
-  padding: 4px 16px 4px 16px;
-  border: none;
-  color: #FFFF;
-  height: 44px;
-  border-radius: 3px;
-  cursor: pointer;
-  margin-top: 15px;
-}
-.buttons-primary:hover {
-  background-color: #1140eb;
-}
-.buttons-primary:active {
-  background-color: #1535ab;
-}
-
-.icons {
-  width: 20px;
-  height: 20px;
-}
-.icons-gray-light {
-  color: #9a9d9c;
-}
-
-/* APP NAMES */
-.app-name-white {
-  font-size: 24px;
-  font-weight: 600;
-  color: #fff;
+.main-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
 }

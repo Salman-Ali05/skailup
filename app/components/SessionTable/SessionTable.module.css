@@ -1,0 +1,48 @@
+.session-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.session-table th,
+.session-table td {
+    padding: 12px 8px;
+    text-align: left;
+    font-size: 14px;
+    vertical-align: middle;
+}
+
+.session-table tr {
+    border-bottom: 1px solid #eee;
+}
+
+.text-muted {
+    color: #888;
+    font-size: 12px;
+}
+
+.project-badges {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.project-chip {
+    background-color: #f1f1f1;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    margin-right: 6px;
+    color: #666;
+}
+
+.icon-btn:hover {
+    color: #1b43d0;
+}

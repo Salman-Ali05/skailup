@@ -1,0 +1,25 @@
+.user-stack {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.user-avatar {
+    border-radius: 50%;
+    border: 2px solid #fff;
+    z-index: 1;
+    margin-left: -10px;
+    position: relative;
+}
+
+.user-avatar:first-child {
+    margin-left: 0;
+}
+
+.extra-count {
+    font-size: 12px;
+    background: #eee;
+    padding: 2px 6px;
+    border-radius: 999px;
+    z-index: 0;
+}

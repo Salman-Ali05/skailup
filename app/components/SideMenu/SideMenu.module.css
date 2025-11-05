@@ -1,0 +1,76 @@
+.side-menu {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    height: 100vh;
+    background-color: #fff;
+    padding: 24px;
+    border-right: 1px solid #eee;
+}
+
+.side-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.side-menu-profile {
+    display: flex;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 8px;
+    border-radius: 8px;
+    margin-bottom: 32px;
+}
+
+.profile-avatar {
+    margin-right: 10px;
+}
+
+.profile-img {
+    border-radius: 8px;
+}
+
+.profile-info .profile-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0;
+}
+
+.profile-info .profile-role {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+}
+
+.side-menu-links {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.side-menu-link {
+    display: flex;
+    align-items: center;
+    color: #252525;
+    font-size: 15px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.side-menu-link.active {
+    color: #1B43D0;
+    font-weight: 500;
+    border-left: 4px solid #1B43D0;
+    padding-left: 8px;
+}
+
+.side-menu-link:hover {
+    color: #1B43D0;
+}
+
+.side-menu-icon {
+    margin-right: 12px;
+    font-size: 18px;
+}
