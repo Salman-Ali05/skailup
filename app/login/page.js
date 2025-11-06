@@ -1,23 +1,19 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from "next/navigation";
 import AppName from '../components/AppName';
 import styles from "./login.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { useRouteTo } from "../utils/router";
+
 
 const LoginPage = () => {
-    const router = useRouter();
-
+    const routeTo = useRouteTo();
     const onSubmit = (e) => {
         e.preventDefault();
-        router.push('/structures/str_home');
+        routeTo('/structures/str_home');
     };
-
-    const handleShuffleClick = (url) => {
-        router.push(url);
-    }
 
     return (
         <div className="container">
@@ -31,8 +27,8 @@ const LoginPage = () => {
 
             <div className={styles["connection-form"]}>
                 <div className={styles["shuffle-form"]}>
-                    <button type="submit" className="buttons-primary" onClick={() => handleShuffleClick('/login')}>Se connecter</button>
-                    <button type="submit" className="buttons-unselected" onClick={() => handleShuffleClick('/register')}>S'inscrire</button>
+                    <button type="submit" className="buttons-primary" onClick={() => routeTo("/login")}>Se connecter</button>
+                    <button type="submit" className="buttons-unselected" onClick={() => routeTo('/register')}>S'inscrire</button>
                 </div>
                 <form className="forms" onSubmit={onSubmit}>
                     <h2 className={styles["log-title"]}>Connexion</h2>

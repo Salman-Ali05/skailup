@@ -1,20 +1,16 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from "next/navigation";
 import AppName from '../components/AppName';
 import styles from "./register.module.css";
+import { useRouteTo } from "../utils/router";
 
 const RegisterPage = () => {
-    const router = useRouter();
+    const routeTo = useRouteTo();
 
     const onSubmit = (e) => {
         e.preventDefault();
-        router.push('/structures/str_home');
-    };
-
-    const handleShuffleClick = (url) => {
-        router.push(url);
+        routeTo('/structures/str_home');
     };
 
     return (
@@ -29,8 +25,8 @@ const RegisterPage = () => {
 
             <div className={styles["register-form"]}>
                 <div className={styles["shuffle-form"]}>
-                    <button className="buttons-unselected" onClick={() => handleShuffleClick('/login')}>Se connecter</button>
-                    <button className="buttons-primary" onClick={() => handleShuffleClick('/register')}>S'inscrire</button>
+                    <button className="buttons-unselected" onClick={() => routeTo("/login")}>Se connecter</button>
+                    <button className="buttons-primary" onClick={() => routeTo("/register")}>S'inscrire</button>
                 </div>
                 <form className="forms" onSubmit={onSubmit}>
                     <h2 className={styles["form-title"]}>Inscription</h2>

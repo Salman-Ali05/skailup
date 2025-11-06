@@ -2,32 +2,34 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 70px;
-    padding: 0 24px;
+    padding: 16px 24px;
     background-color: #fff;
-    box-shadow: 0px 1px 2px rgba(0, 0, 0, 0.05);
+    border-bottom: 1px solid #f0f0f0;
 }
 
 .header-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
+    position: relative;
 }
 
 .message-button {
-    background-color: #f5f5f5;
+    background: none;
     border: none;
-    padding: 8px;
-    border-radius: 12px;
     cursor: pointer;
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background 0.2s ease;
 }
 
 .message-button:hover {
-    background-color: #eaeaea;
+    background-color: #f3f4f6;
+}
+
+.profile-container {
+    position: relative;
+    cursor: pointer;
 }
 
 .profile {
@@ -38,7 +40,6 @@
 
 .profile-img {
     border-radius: 50%;
-    object-fit: cover;
 }
 
 .profile-info {
@@ -49,11 +50,97 @@
 .profile-name {
     font-weight: 600;
     font-size: 14px;
-    margin: 0;
+    color: #0f172a;
 }
 
 .profile-role {
     font-size: 13px;
-    color: #9a9d9c;
-    margin: 0;
+    color: #94a3b8;
+    margin-top: 2px;
+}
+
+/* Dropdown */
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    width: 260px;
+    z-index: 100;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-user {
+    padding: 20px;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.dropdown-user .role {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.dropdown-user .name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #0f172a;
+    margin-top: 4px;
+}
+
+.dropdown-user .email {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.entreprise {
+    margin-top: 16px;
+    background-color: #f9fafb;
+    padding: 10px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.entreprise-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: #111827;
+}
+
+.entreprise-type {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.dropdown-actions {
+    display: flex;
+    flex-direction: column;
+}
+
+.dropdown-btn {
+    background: none;
+    border: none;
+    padding: 14px 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    cursor: pointer;
+    color: #0f172a;
+    transition: background 0.2s;
+}
+
+.dropdown-btn:hover {
+    background-color: #f3f4f6;
+}
+
+.logo-entreprise {
+    border-radius: 8px;
 }
