@@ -23,7 +23,7 @@ body {
   color: white;
   font-weight: 700;
   display: flex;
-  gap : 8px;
+  gap: 8px;
   width: fit-content;
 }
 
@@ -31,13 +31,15 @@ body {
   color: #333;
   font-weight: 700;
   display: flex;
-  gap : 8px;
+  gap: 8px;
   width: fit-content;
 }
 
-.logo{
-  height: auto;
-  width: fit-content;
+.app-logo {
+  width: 65px;
+  height: 65px;
+  display: flex;
+  align-self: center;
 }
 
 /* LAYOUT STRUCTURE */

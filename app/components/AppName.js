@@ -12,7 +12,7 @@ const PageName = ({ size, logo }) => {
     return (
         <div className={className}>
             <h1 style={{ fontSize: size }}>SKAILUP</h1>
-            {logo && <img src={logo} alt="Logo" className="logo"/>}
+            {logo && <img src={logo} alt="Logo" className="app-logo"/>}
         </div>
     );
 };
