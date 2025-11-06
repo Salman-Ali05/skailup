@@ -1,78 +1,137 @@
 .register-form {
-    display: flex;
-    width: 50%;
-    flex-direction: column;
-    height: 100vh;
+  width: 50%;
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background-color: #fff;
+}
+
+.forms {
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 24px;
+  color: #0f172a;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.inputs {
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
+  color: #0f172a;
+}
+
+.inputs::placeholder {
+  color: #94a3b8;
+}
+
+/* App name section à gauche */
+
+.app-name-form {
+  width: 50%;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e3a8a, #3b82f6);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  flex-direction: column;
+  border-top-left-radius: 20px;
+  border-bottom-left-radius: 20px;
+}
+
+.app-name-form h1 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.app-name-form p {
+  font-size: 24px;
+  opacity: 0.9;
+}
+
+.app-name-bottomed {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  bottom: 20px;
+}
+
+/* Switch buttons */
+
+.shuffle-form {
+  text-align: center;
+  font-size: 14px;
+  background-color: #dbdbdb;
+  display: flex;
+  border-radius: 8px;
+  width: fit-content;
+  gap: 5px;
+  margin-bottom: 24px;
+}
+
+.buttons-primary {
+  padding: 14px;
+  width: 100%;
+  background-color: #1d4ed8;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.buttons-primary:hover {
+  background-color: #1e40af;
+}
+
+.buttons-unselected {
+  padding: 14px;
+  border-radius: 12px;
+  background-color: #f1f5f9;
+  border: none;
+  font-weight: 500;
+  color: #0f172a;
+  cursor: pointer;
+}
+
+@media (max-width: 840px) {
+  .register-form {
+    width: 100%;
+    padding: 40px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
     justify-content: center;
-    align-items: center;
+    height: 100vh;
   }
-  
-  .forms>div {
-    margin-bottom: 20px;
-  }
-  
-  .form-group {
-    display: flex;
-    flex-direction: column;
-    margin-top: 20px;
-  }
-  .form-group label {
-    width: fit-content;
-  }
-  
+
   .app-name-form {
-    width: 50%;
-    height: 100vh;
-    background-color: #333333;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    display: none;
   }
-  
-  .sub-title {
-    text-align: center;
-    color: #252525;
-  }
-  
-  .password-label-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .reveal-password {
-    display: flex;
-    align-items: center;
-    color: #9a9d9c;
-    cursor: pointer;
-    font-size: 13px;
-  }
-  .reveal-password span {
-    margin-right: 5px;
-    display: flex;
-    align-items: center;
-    justify-self: center;
-  }
-  
-  .forgot-password{
-    margin-top: 5px;
-    font-size: 13px;
-    color: #9a9d9c;
-  }
-  .forgot-password:hover{
-    text-decoration: underline;
-  }
-  
-  .shuffle-form {
-    font-size: 14px;
-    text-align: center;
-    cursor: pointer;
-  }
-  
-  .shuffle-form:hover {
-    text-decoration: underline;
-  }
-  
-  .shuffle-form a {
-    color : #1b97d0;
-  }
+}

@@ -6,10 +6,13 @@ import Header from './components/header/Header';
 
 export default function LayoutWrapper({ children }) {
     const pathname = usePathname();
+
+    if (!pathname) return null;
+
     const isAuthPage = pathname === '/login' || pathname === '/register';
 
     if (isAuthPage) {
-        return children;
+        return <>{children}</>;
     }
 
     return (

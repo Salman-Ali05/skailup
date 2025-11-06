@@ -3,7 +3,7 @@
 import React from 'react';
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import PageNameWhite from '../components/AppName';
+import AppName from '../components/AppName';
 import styles from "./login.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
@@ -16,14 +16,30 @@ const LoginPage = () => {
         router.push('/structures/str_home');
     };
 
+    const handleShuffleClick = (url) => {
+        router.push(url);
+    }
+
     return (
         <div className="container">
+            <div className={styles["app-name-form"]}>
+                <h1>Bienvenue sur SkailUp</h1>
+                <p>Site en cours de construction</p>
+                <div className={styles["app-name-bottomed"]} >
+                    <AppName size={52} logo={"./skailup_logo_only.png"} />
+                </div>
+            </div>
+
             <div className={styles["connection-form"]}>
+                <div className={styles["shuffle-form"]}>
+                    <button type="submit" className="buttons-primary" onClick={() => handleShuffleClick('/login')}>Se connecter</button>
+                    <button type="submit" className="buttons-unselected" onClick={() => handleShuffleClick('/register')}>S'inscrire</button>
+                </div>
                 <form className="forms" onSubmit={onSubmit}>
                     <h2 className={styles["log-title"]}>Connexion</h2>
 
                     <div className={styles["form-group"]}>
-                        <label>Email</label>
+                        <label>Mail</label>
                         <input type="email" className="inputs" placeholder="Email" name="email" />
                     </div>
 
@@ -42,18 +58,9 @@ const LoginPage = () => {
                     <button type="submit" className="buttons-primary">Se connecter</button>
                 </form>
 
-                <div className={styles["shuffle-form"]}>
-                    <p>Pas encore inscrit ? <Link href="/register">S'inscrire</Link></p>
-                </div>
             </div>
 
-            <div className={styles["app-name-form"]}>
-
-                <PageNameWhite />
-
-            </div>
-
-        </div>
+        </div >
     );
 };
 

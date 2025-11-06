@@ -3,7 +3,7 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 
-const PageName = () => {
+const PageName = ({ size, logo }) => {
     const pathname = usePathname();
     const isAuthPage = pathname === "/login" || pathname === "/register";
 
@@ -11,7 +11,8 @@ const PageName = () => {
 
     return (
         <div className={className}>
-            <h1>SKAILUP</h1>
+            <h1 style={{ fontSize: size }}>SKAILUP</h1>
+            {logo && <img src={logo} alt="Logo" className="logo"/>}
         </div>
     );
 };
