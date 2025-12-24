@@ -1,0 +1,53 @@
+.profileWrapper {
+    background: #fff;
+    padding: 40px;
+    border-radius: 16px;
+    margin: 0 auto;
+}
+
+.headerSection {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 24px;
+    color: #1e293b;
+}
+
+.shuffler {
+    display: flex;
+    gap: 16px;
+}
+
+.tabs {
+    display: flex;
+    gap: 32px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 32px;
+    width: fit-content;
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 12px 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #475569;
+    position: relative;
+}
+
+.tab:hover {
+    color: #1d4ed8;
+}
+
+.tab.active {
+    color: #1d4ed8;
+    border-bottom: 2px solid #1d4ed8;
+    font-weight: bold;
+}

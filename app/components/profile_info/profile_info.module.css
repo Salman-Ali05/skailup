@@ -1,0 +1,71 @@
+.avatarSection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.avatar {
+    border-radius: 50%;
+}
+
+.avatarActions {
+    display: flex;
+    gap: 12px;
+}
+
+.iconButton {
+    border: none;
+    background: white;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.2s ease;
+    border: 1px solid #1d4ed8;
+    color: #1d4ed8;
+}
+
+.iconButton:hover {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.formDouble,
+.formTriple {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.formDouble .formGroup,
+.formTriple .formGroup {
+    flex: 1;
+    min-width: 200px;
+}
+
+.formGroupLinkedin {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.linkedIcon {
+    color: #1d4ed8;
+}
+
+.submitWrapper {
+    margin-top: 24px;
+}

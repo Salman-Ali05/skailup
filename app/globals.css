@@ -76,6 +76,7 @@ body {
   font-size: 14px;
   background-color: #fff;
   color: #0f172a;
+  flex: 1;
 }
 
 .inputs::placeholder {
