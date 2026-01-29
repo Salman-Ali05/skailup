@@ -14,6 +14,8 @@ const LoginPage = () => {
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -21,7 +23,7 @@ const LoginPage = () => {
         setError('');
 
         try {
-            const response = await fetch('https://skailup-backend.vercel.app/auth/login', {
+            const response = await fetch(`${API_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -41,7 +43,7 @@ const LoginPage = () => {
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
             }
-            
+
             routeTo('/structures/str_home');
         } catch (err) {
             setError(err.message || 'An error occurred');
@@ -72,10 +74,10 @@ const LoginPage = () => {
 
                     <div className={styles["form-group"]}>
                         <label>Mail</label>
-                        <input 
-                            type="email" 
-                            className="inputs" 
-                            placeholder="Email" 
+                        <input
+                            type="email"
+                            className="inputs"
+                            placeholder="Email"
                             name="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -91,9 +93,9 @@ const LoginPage = () => {
                                 <span><FontAwesomeIcon icon={faEye} className={styles["icons icons-gray-light"]} /></span>
                             </div>
                         </div>
-                        <input 
-                            type="password" 
-                            className="inputs" 
+                        <input
+                            type="password"
+                            className="inputs"
                             placeholder="Mot de passe"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
