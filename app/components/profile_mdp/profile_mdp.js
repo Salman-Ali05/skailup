@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Image from "next/image";
 import styles from "./profile_mdp.module.css";
-import { FiEdit2, FiTrash2, FiLinkedin } from "react-icons/fi";
 
 const ProfileMdp = () => {
 

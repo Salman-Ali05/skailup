@@ -21,7 +21,7 @@ const LoginPage = () => {
         setError('');
 
         try {
-            const response = await fetch('https://skailup-backend.vercel.app', {
+            const response = await fetch('https://skailup-backend.vercel.app/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
