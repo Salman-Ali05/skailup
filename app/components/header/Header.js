@@ -6,8 +6,12 @@ import { FiMessageCircle } from "react-icons/fi";
 import { FiUser, FiLogOut } from "react-icons/fi";
 import styles from "./Header.module.css";
 import { useRouteTo } from "../../utils/router";
+import { useUser } from "@/app/utils/contexts/userContext";
 
 const Header = () => {
+    const { userDetails } = useUser();
+    const { user } = useUser();
+    
     const routeTo = useRouteTo();
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef();
@@ -43,8 +47,8 @@ const Header = () => {
                             className={styles["profile-img"]}
                         />
                         <div className={styles["profile-info"]}>
-                            <p className={styles["profile-name"]}>Solène SEGUIN</p>
-                            <p className={styles["profile-role"]}>Compte Structure</p>
+                            <p className={styles["profile-name"]}>{userDetails?.first_name} {userDetails?.last_name}</p>
+                            <p className={styles["profile-role"]}>Compte {userDetails?.os_type_user.lang_fr}</p>
                         </div>
                     </div>
 

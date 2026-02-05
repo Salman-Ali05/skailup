@@ -1,36 +1,69 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./profile_info.module.css";
 import { FiEdit2, FiTrash2, FiLinkedin } from "react-icons/fi";
+import { useUser } from "@/app/utils/contexts/userContext";
 
 const ProfileInfo = () => {
 
+    const { userDetails } = useUser();
+    const { user } = useUser();
+    const { session } = useUser();
+    
     // --- STATES POUR TOUS LES CHAMPS ---
-    const [email, setEmail] = useState("demo.participant@skailup.com");
-    const [fullName, setFullName] = useState("Solène Seguin");
+    const [email, setEmail] = useState("");
+    const [fName, setFName] = useState("");
+    const [lName, setLName] = useState("");
     const [civility, setCivility] = useState("Madame");
-    const [birthDate, setBirthDate] = useState("2025-06-23");
-    const [phone, setPhone] = useState("+33 1 23 45 67 89");
-    const [city, setCity] = useState("Paris");
-    const [postalCode, setPostalCode] = useState("010000");
-    const [address, setAddress] = useState("11 rue jean jaures 75000");
+    const [birthDate, setBirthDate] = useState("");
+    const [phone, setPhone] = useState("");
+    const [town, setTown] = useState("");
+    const [zipCode, setZipCode] = useState("");
+    const [address, setAddress] = useState("");
     const [linkedin, setLinkedin] = useState("");
 
-    const handleSubmit = (e) => {
+    useEffect(() => {
+        if (userDetails) {
+            setEmail(user.email || "");
+            setFName(userDetails.first_name || "");
+            setLName(userDetails.last_name || "");
+            setCivility(userDetails.gender || "");
+            setBirthDate(userDetails.birthday || "");
+            setPhone(userDetails.phone || "");
+            setTown(userDetails.town || "");
+            setZipCode(userDetails.zip_code || "");
+            setAddress(userDetails.address || "");
+            setLinkedin(userDetails.linkedin || "");
+        }
+    }, [userDetails]);
+    
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("📌 Données sauvegardées :", {
-            email,
-            fullName,
-            civility,
-            birthDate,
-            phone,
-            city,
-            postalCode,
-            address,
-            linkedin
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${session?.access_token}` },
+            body: JSON.stringify({
+                email,
+                first_name: fName,
+                last_name: lName, 
+                gender: civility,
+                birthday: birthDate,
+                phone : phone,
+                town : town,
+                zip_code: zipCode,
+                address,
+                linkedin,
+            }),
         });
+        if (!res.ok) {
+            // gérer l'erreur (afficher un message à l'utilisateur, etc.)
+            console.error("Failed to update profile");
+        } else {
+            alert("Profil mis à jour avec succès !");
+        }
     };
 
     return (
@@ -62,12 +95,21 @@ const ProfileInfo = () => {
                 {/* NOM & CIVILITÉ */}
                 <div className={styles.formDouble}>
                     <div className={styles.formGroup}>
-                        <label>Nom et prénom</label>
+                        <label>Nom</label>
                         <input
                             type="text"
                             className="inputs"
-                            value={fullName}
-                            onChange={(e) => setFullName(e.target.value)}
+                            value={lName}
+                            onChange={(e) => setLName(e.target.value)}
+                        />
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label>Prénom</label>
+                        <input
+                            type="text"
+                            className="inputs"
+                            value={fName}
+                            onChange={(e) => setFName(e.target.value)}
                         />
                     </div>
 
@@ -114,8 +156,8 @@ const ProfileInfo = () => {
                         <input
                             type="text"
                             className="inputs"
-                            value={city}
-                            onChange={(e) => setCity(e.target.value)}
+                            value={town}
+                            onChange={(e) => setTown(e.target.value)}
                         />
                     </div>
 
@@ -124,8 +166,8 @@ const ProfileInfo = () => {
                         <input
                             type="text"
                             className="inputs"
-                            value={postalCode}
-                            onChange={(e) => setPostalCode(e.target.value)}
+                            value={zipCode}
+                            onChange={(e) => setZipCode(e.target.value)}
                         />
                     </div>
 

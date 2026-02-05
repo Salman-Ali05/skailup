@@ -1,5 +1,6 @@
 import "./globals.css";
 import LayoutWrapper from "./layout-wrapper";
+import { UserProvider } from "./utils/contexts/userContext";
 
 export const metadata = {
   title: "Skailup",
@@ -10,9 +11,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr">
       <body>
-        <LayoutWrapper>
-          {children}
-        </LayoutWrapper>
+        <UserProvider>
+          <LayoutWrapper>
+            {children}
+          </LayoutWrapper>
+        </UserProvider>
       </body>
     </html>
   );

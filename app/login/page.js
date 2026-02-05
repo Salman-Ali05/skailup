@@ -6,7 +6,7 @@ import styles from "./login.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye } from '@fortawesome/free-solid-svg-icons';
 import { useRouteTo } from "../utils/router";
-
+import { useUser } from "@/app/utils/contexts/userContext";
 
 const LoginPage = () => {
     const routeTo = useRouteTo();
@@ -15,7 +15,7 @@ const LoginPage = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-
+    const { loginUser } = useUser();
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -39,11 +39,14 @@ const LoginPage = () => {
             }
 
             const data = await response.json();
-            // Store token if your backend returns one
-            if (data.token) {
-                localStorage.setItem('authToken', data.token);
+            if (data?.user && data?.session && data?.user_details) {
+                loginUser({
+                    user: data.user,
+                    session: data.session,
+                    user_details: data.user_details,
+                    os_type_user: data.os_type_user,
+                });
             }
-
             routeTo('/structures/str_home');
         } catch (err) {
             setError(err.message || 'An error occurred');
