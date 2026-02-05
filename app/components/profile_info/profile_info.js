@@ -3,15 +3,16 @@
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import styles from "./profile_info.module.css";
-import { FiEdit2, FiTrash2, FiLinkedin } from "react-icons/fi";
+import { FiEdit2, FiTrash2, FiLinkedin, FiCheck } from "react-icons/fi";
 import { useUser } from "@/app/utils/contexts/userContext";
+import { showToast } from "nextjs-toast-notify";
 
 const ProfileInfo = () => {
 
     const { userDetails } = useUser();
     const { user } = useUser();
     const { session } = useUser();
-    
+
     // --- STATES POUR TOUS LES CHAMPS ---
     const [email, setEmail] = useState("");
     const [fName, setFName] = useState("");
@@ -38,7 +39,7 @@ const ProfileInfo = () => {
             setLinkedin(userDetails.linkedin || "");
         }
     }, [userDetails]);
-    
+
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,21 +49,29 @@ const ProfileInfo = () => {
             body: JSON.stringify({
                 email,
                 first_name: fName,
-                last_name: lName, 
+                last_name: lName,
                 gender: civility,
                 birthday: birthDate,
-                phone : phone,
-                town : town,
+                phone: phone,
+                town: town,
                 zip_code: zipCode,
                 address,
                 linkedin,
             }),
         });
         if (!res.ok) {
-            // gérer l'erreur (afficher un message à l'utilisateur, etc.)
-            console.error("Failed to update profile");
+            showToast.error("Erreur lors de la mise à jour du profil", {
+                duration: 5000,
+                position: "top-left",
+                progress: true
+            });
+            console.error("Error : " + res.statusText);
         } else {
-            alert("Profil mis à jour avec succès !");
+            showToast.success("Profile mis à jour !", {
+                duration: 5000,
+                position: "top-left",
+                progress: true
+            });
         }
     };
 
@@ -141,10 +150,11 @@ const ProfileInfo = () => {
                     <div className={styles.formGroup}>
                         <label>Téléphone personnel</label>
                         <input
-                            type="tel"
+                            type="number"
                             className="inputs"
+                            maxLength="10"
                             value={phone}
-                            onChange={(e) => setPhone(e.target.value)}
+                            onChange={(e) => setPhone(e.target.value.slice(0, 10))}
                         />
                     </div>
                 </div>
@@ -167,7 +177,7 @@ const ProfileInfo = () => {
                             type="text"
                             className="inputs"
                             value={zipCode}
-                            onChange={(e) => setZipCode(e.target.value)}
+                            onChange={(e) => setZipCode(e.target.value.slice(0, 5))}
                         />
                     </div>
 

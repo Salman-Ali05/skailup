@@ -10,7 +10,7 @@ import styles from "./SideMenu.module.css";
 
 const menuItems = [
     { label: "Accueil", icon: <FaHome />, href: "/structures/str_home" },
-    { label: "Intervenants", icon: <FaBullhorn />, href: "/structures/str_users" },
+    { label: "Intervenants", icon: <FaBullhorn />, href: "/structures/str_contributors" },
     { label: "Projects", icon: <FaUsers />, href: "/structures/str_projects" },
     { label: "Programmes", icon: <FaRocket />, href: "/structures/str_programs" },
     { label: "Ressources", icon: <FaFolder />, href: "/structures/str_resources" },

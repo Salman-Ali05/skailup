@@ -1,0 +1,142 @@
+.structure-content {
+    padding: 32px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    gap : 32px;
+}
+
+.headerRow {
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+}
+
+.headerRow h2 {
+    margin: 0;
+}
+
+.headerActions {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tabs {
+    display: flex;
+    gap: 12px;
+}
+
+.tab,
+.tabActive {
+    background: transparent;
+    border: none;
+    font-size: 16px;
+    padding: 8px 10px;
+    cursor: pointer;
+    color: #666;
+}
+
+.tabActive {
+    color: #2450ff;
+    border-bottom: 2px solid #2450ff;
+}
+
+.tools {
+    display: flex;
+    gap: 10px;
+    align-items: center
+}
+
+.addBtn {
+    background: transparent;
+    border: 1px solid #2b5bff;
+    color: #2b5bff;
+    padding: 8px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.contributors-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.contributors-table thead tr {
+    background: #f6f7fb;
+}
+
+.contributors-table th,
+.contributors-table td {
+    text-align: left;
+    padding: 16px 18px;
+    font-size: 14px;
+    color: #444;
+    border-bottom: 1px solid #f0f1f6;
+}
+
+.colContributor {
+    display: flex;
+    align-items: center
+}
+
+.avatarWrap {
+    display: flex;
+    align-items: center;
+    gap: 12px
+}
+
+.avatar {
+    border-radius: 50%;
+    object-fit: cover
+}
+
+.name {
+    font-weight: 600
+}
+
+.emailCell {
+    color: #777;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.roleBadge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: 1px solid #d9e0ff;
+    color: #2450ff;
+    font-size: 13px;
+}
+
+.programs {
+    color: #ff8a5b
+}
+
+.actions {
+    text-align: right
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9aa0b4
+}
+
+@media (max-width: 900px) {
+
+    .contributors-table th:nth-child(4),
+    .contributors-table td:nth-child(4),
+    .contributors-table th:nth-child(5),
+    .contributors-table td:nth-child(5) {
+        display: none;
+    }
+}

@@ -69,7 +69,10 @@ const Header = () => {
                             </div>
 
                             <div className={styles["dropdown-actions"]}>
-                                <button className={styles["dropdown-btn"]} onClick={() => routeTo('/profile/info')}>
+                                <button className={styles["dropdown-btn"]} onClick={() => {
+                                    setOpen(false);
+                                    routeTo('/profile/info');
+                                }}>
                                     <FiUser /> <span>Profile</span>
                                 </button>
                                 <button className={styles["dropdown-btn"]} onClick={() => routeTo('/login')}>

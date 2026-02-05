@@ -1,0 +1,7 @@
+.filterBtn {
+    background: #f3f4f8;
+    border: 1px solid #e6e7ee;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
