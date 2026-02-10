@@ -3,7 +3,6 @@
 import React from "react";
 import { usePathname } from "next/navigation";
 import { FaHome, FaBullhorn, FaUsers, FaRocket, FaFolder, FaCog } from "react-icons/fa";
-import AppName from "../AppName";
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./SideMenu.module.css";
@@ -24,23 +23,18 @@ const SideMenu = () => {
         <div className={styles["side-menu"]}>
             <div className={styles["side-menu-top"]}>
                 <div className={styles["side-menu-header"]}>
-                    <AppName />
-                </div>
-
-                <div className={styles["side-menu-profile"]}>
-                    <div className={styles["profile-avatar"]}>
-                        <Image
-                            src="/logoproj.jpg"
-                            alt="Logo Structure"
-                            width={36}
-                            height={36}
-                            className={styles["profile-img"]}
-                        />
-                    </div>
-                    <div className={styles["profile-info"]}>
-                        <p className={styles["profile-name"]}>MieuxReussir</p>
-                        <p className={styles["profile-role"]}>Structure</p>
-                    </div>
+                    <Image
+                        src="/logoonly.png"
+                        alt="Logo Structure"
+                        width={30}
+                        height={30}
+                    />
+                    <Image
+                        src="/textonlylogo.png"
+                        alt="Logo Structure"
+                        width={150}
+                        height={40}
+                    />
                 </div>
 
                 <div className={styles["side-menu-links"]}>

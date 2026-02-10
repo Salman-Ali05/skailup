@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import { FiEye } from "react-icons/fi";
+import { FiEye, FiPlusCircle } from "react-icons/fi";
 import style from "./str_contributors.module.css";
 import FilterContributors from "@/app/components/Filters/FilterContributors/FilterContributor";
 
@@ -55,21 +55,21 @@ const StructureContributors = () => {
 
                             <div className={style.tools}>
                                 <FilterContributors />
-                                <button className={style.addBtn}>+ Nouvel intervenant</button>
+                                <button className="buttons-primary-reversed"><FiPlusCircle /> Nouvel intervenant</button>
                             </div>
                         </div>
                     </div>
 
                     <table className={style["contributors-table"]}>
-                        <thead >
+                        <thead>
                             <tr>
-                                <th>Intervenant</th>
+                                <th className="th-first">Intervenant</th>
                                 <th>Société</th>
                                 <th>Email</th>
                                 <th>Rôle</th>
                                 <th>Dernière connexion</th>
                                 <th>Programmes</th>
-                                <th>Actions</th>
+                                <th className="th-last">Actions</th>
                             </tr>
                         </thead>
                         <tbody>

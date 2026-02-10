@@ -46,3 +46,17 @@
 .icon-btn:hover {
     color: #1b43d0;
 }
+
+
+.table-session {
+    border-radius: 12px !important;
+}
+
+.table-header {
+    border-radius: 12px !important;
+    background-color: #F5F6F8;
+}
+
+.table-session-rows{
+    margin-left: 10px;
+}

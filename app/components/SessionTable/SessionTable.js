@@ -31,10 +31,10 @@ const sessions = [
 const SessionTable = () => {
     return (
         <div className={style["session-table"]}>
-            <table>
-                <thead>
+            <table className={style["table-session"]}>
+                <thead className={style["table-header"]}>
                     <tr>
-                        <th>Programme</th>
+                        <th className={style["table-session-rows"]}>Programme</th>
                         <th>Session</th>
                         <th>Date</th>
                         <th>Heure</th>

@@ -2,15 +2,15 @@
 
 import React from "react"
 import style from "./FilterContributors.module.css"
-import { FaBars } from "react-icons/fa"
+import { IoFilterOutline } from "react-icons/io5";
 
 const FilterContributors = () => {
 
     return (
-    <div>
-        <button className={style.filterBtn}><FaBars /> Filtre</button>
-        <button className="buttons-primary-reversed">Test</button>
-    </div>
-    )}
+        <div>
+            <button className={style.filterBtn}><IoFilterOutline /> Filtre</button>
+        </div>
+    )
+}
 
 export default FilterContributors
