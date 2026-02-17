@@ -26,17 +26,17 @@
     align-items: center
 }
 
-.contributors-table {
+.projects-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 8px;
 }
 
-.contributors-table thead tr {
+.projects-table thead tr {
     background: #f5f6f8;
 }
 
-.colContributor {
+.colProject {
     display: flex;
     align-items: center
 }
@@ -86,10 +86,10 @@
 
 @media (max-width: 900px) {
 
-    .contributors-table th:nth-child(4),
-    .contributors-table td:nth-child(4),
-    .contributors-table th:nth-child(5),
-    .contributors-table td:nth-child(5) {
+    .projects-table th:nth-child(4),
+    .projects-table td:nth-child(4),
+    .projects-table th:nth-child(5),
+    .projects-table td:nth-child(5) {
         display: none;
     }
 }

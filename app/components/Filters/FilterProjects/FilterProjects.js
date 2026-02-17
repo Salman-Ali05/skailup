@@ -1,10 +1,10 @@
 "use client"
 
 import React from "react"
-import style from "./FilterContributors.module.css"
+import style from "./FilterProjects.module.css"
 import { IoFilterOutline } from "react-icons/io5";
 
-const FilterContributors = () => {
+const FilterProjects = () => {
 
     return (
         <div>
@@ -13,4 +13,4 @@ const FilterContributors = () => {
     )
 }
 
-export default FilterContributors
+export default FilterProjects

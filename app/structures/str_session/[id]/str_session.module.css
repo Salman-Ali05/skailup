@@ -1,0 +1,211 @@
+.structure-content {
+    padding: 24px 40px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.headerRow {
+    display: flex;
+    justify-content: space-between;
+}
+
+.headerRow h2 {
+    margin: 0;
+}
+
+.tools {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+
+}
+
+.contributors-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.contributors-table thead tr {
+    background: #f5f6f8;
+}
+
+.colContributor {
+    display: flex;
+    align-items: center
+}
+
+.emailCell {
+    color: #777;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.roleBadge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: 1px solid #d9e0ff;
+    color: #2450ff;
+    font-size: 13px;
+}
+
+.activity {
+    color: #ff8a5b
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.cr-btn {
+    max-width: 100px;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9aa0b4
+}
+
+.topSection {
+    gap: 24px;
+}
+
+.topLeft {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.description {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.cardsRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 8px;
+    width: 100%;
+}
+
+.card {
+    background: #f7f8fa;
+    border-radius: 24px;
+    padding: 20px;
+    box-shadow: none;
+    display: flex;
+    flex-direction: column;
+    height: 160px;
+    gap: 8px;
+    justify-content: space-between;
+    min-width: 300px;
+}
+
+.cardTitle {
+    font-weight: 600;
+    color: #1230d6;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+}
+
+.cardBody {
+    color: #374151;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.progressText {
+    color: #2450ff;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.progressBar {
+    height: 8px;
+    background: #e9eefb;
+    border-radius: 999px;
+    overflow: hidden;
+    width: 100%;
+}
+
+.progressFill {
+    height: 100%;
+    background: linear-gradient(90deg, #2450ff, #6b8dff);
+    border-radius: 999px;
+}
+
+.meta {
+    color: #9aa0b4;
+    font-size: 12px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 10px;
+    background: #eef4ff;
+    color: #2450ff;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #ddd;
+    display: inline-block;
+}
+
+.projectBadge {
+    background: #0f1724;
+    color: #fff;
+    padding: 6px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+.buttonActivityTrack {
+    background-color: rgba(29, 78, 216, 0.2);
+    color: #1d4ed8;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: none;
+}
+.buttonActivityTrack:hover {
+    background-color: rgba(29, 78, 216, 0.4);
+}
+
+/* small responsive tweaks */
+@media (max-width: 900px) {
+    .cardsRow {
+        flex-direction: column;
+    }
+
+    .card {
+        min-width: auto;
+        flex: 1 1 auto;
+    }
+}

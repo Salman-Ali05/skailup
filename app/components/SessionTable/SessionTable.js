@@ -2,8 +2,10 @@
 
 import React from "react";
 import SessionStatus from "../SessionStatus/SessionStatus";
-import ListUsersInSession from "../ListUsersInSession/ListUsersInSession";
 import style from "./SessionTable.module.css";
+import EyesIcon from "../Icons/Eyes";
+import GoToIcon from "../Icons/GoTo";
+import ListUsers from "../ListUsers/ListUsers";
 
 const sessions = [
     {
@@ -14,7 +16,23 @@ const sessions = [
         duration: "2h",
         activity: "Coaching",
         speakers: ["Julie Lafontaine"],
-        projects: ["bio", "smart"],
+        projects: [
+            {
+                id: 1,
+                name: "bio",
+                users: [
+                    { firstName: "Alice", lastName: "Dupont" },
+                    { firstName: "Bob", lastName: "Martin" },
+                ],
+            },
+            {
+                id: 2,
+                name: "smart",
+                users: [
+                    { firstName: "Charlie", lastName: "Durand" },
+                ],
+            },
+        ],
     },
     {
         program: "Pépinière 2025",
@@ -24,9 +42,19 @@ const sessions = [
         duration: "1h",
         activity: "Formation",
         speakers: ["Florino Jean", "Florino Jean"],
-        projects: ["bio", "capitole"],
+        projects: [
+            {
+                id: 3,
+                name: "bio",
+                users: [
+                    { firstName: "Diana", lastName: "Bernard" },
+                    { firstName: "Eve", lastName: "Lefevre" },
+                ],
+            },
+        ],
     },
 ];
+
 
 const SessionTable = () => {
     return (
@@ -34,14 +62,14 @@ const SessionTable = () => {
             <table className={style["table-session"]}>
                 <thead className={style["table-header"]}>
                     <tr>
-                        <th className={style["table-session-rows"]}>Programme</th>
-                        <th>Session</th>
-                        <th>Date</th>
-                        <th>Heure</th>
-                        <th>Activité</th>
-                        <th>Intervenants</th>
-                        <th>Projets</th>
-                        <th></th>
+                        <th className="th-150 th-first">Programme</th>
+                        <th className="th-100">Session</th>
+                        <th className="th-100">Date</th>
+                        <th className="th-100">Heure</th>
+                        <th className="th-150">Activité</th>
+                        <th className="th-150">Intervenants</th>
+                        <th className="th-150">Projets</th>
+                        <th className="th-last th-100">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,19 +84,17 @@ const SessionTable = () => {
                             <td>{s.time} ({s.duration})</td>
                             <td>{s.activity}</td>
                             <td>
-                                <ListUsersInSession users={s.speakers} />
+                                <ListUsers users={s.speakers} />
                             </td>
                             <td>
                                 <div className={style["project-badges"]}>
-                                    {s.projects.map((p, j) => (
-                                        <span key={j} className={style["project-chip"]}>{p}</span>
-                                    ))}
+                                    <ListUsers users={s.projects} />
                                 </div>
                             </td>
                             <td>
                                 <div className={style["action-icons"]}>
-                                    <button className={style["icon-btn"]}>👁</button>
-                                    <button className={style["icon-btn"]}>↗</button>
+                                    <EyesIcon />
+                                    <GoToIcon />
                                 </div>
                             </td>
                         </tr>

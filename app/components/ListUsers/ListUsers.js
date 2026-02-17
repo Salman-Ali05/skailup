@@ -1,7 +1,7 @@
 import Image from "next/image";
-import style from "./ListUsersInSession.module.css";
+import style from "./ListUsers.module.css";
 
-const ListUsersInSession = ({ users }) => {
+const ListUsers = ({ users, projects }) => {
     const max = 3;
     const extra = users.length - max;
 
@@ -18,7 +18,12 @@ const ListUsersInSession = ({ users }) => {
                     style={{ zIndex: max - i }}
                 />
             ))}
-            {extra > 0 && (
+            {users.length === 1 && (
+                <span className={style["extra-user"]}>
+                    {users[0].firstName} {users[0].lastName}
+                </span>
+            )}
+            {extra > 1 && (
                 <span className={style["extra-count"]}>
                     +{extra}
                 </span>
@@ -27,4 +32,4 @@ const ListUsersInSession = ({ users }) => {
     );
 };
 
-export default ListUsersInSession;
+export default ListUsers;

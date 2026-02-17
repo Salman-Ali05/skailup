@@ -2,9 +2,10 @@
 
 import React from "react";
 import Image from "next/image";
-import { FiEye, FiPlusCircle } from "react-icons/fi";
+import { FiPlusCircle } from "react-icons/fi";
 import style from "./str_contributors.module.css";
 import FilterContributors from "@/app/components/Filters/FilterContributors/FilterContributor";
+import EyesIcon from "@/app/components/Icons/Eyes";
 
 const sampleContributors = [
     {
@@ -47,15 +48,15 @@ const StructureContributors = () => {
                     <h2>Intervenants</h2>
                     <div className={style.headerRow}>
 
-                        <div className={style.headerActions}>
-                            <div className={style.tabs}>
-                                <button className={style.tabActive}>Inscrit <span>(7)</span></button>
-                                <button className={style.tab}>Invitation <span>(1)</span></button>
+                        <div className="headerActions">
+                            <div className="tabs">
+                                <div className="tab tabActive"><p>Inscrit <span>(7)</span></p></div>
+                                <div className="tab"><p>Invitation <span>(1)</span></p></div>
                             </div>
 
                             <div className={style.tools}>
                                 <FilterContributors />
-                                <button className="buttons-primary-reversed"><FiPlusCircle /> Nouvel intervenant</button>
+                                <button className="buttons-primary-reversed"><FiPlusCircle className="buttons-icon" /> Nouvel intervenant</button>
                             </div>
                         </div>
                     </div>
@@ -63,13 +64,13 @@ const StructureContributors = () => {
                     <table className={style["contributors-table"]}>
                         <thead>
                             <tr>
-                                <th className="th-first">Intervenant</th>
-                                <th>Société</th>
-                                <th>Email</th>
-                                <th>Rôle</th>
-                                <th>Dernière connexion</th>
-                                <th>Programmes</th>
-                                <th className="th-last">Actions</th>
+                                <th className="th-first th-150">Intervenant</th>
+                                <th className="th-150">Société</th>
+                                <th className="th-150">Email</th>
+                                <th className="th-100">Rôle</th>
+                                <th className="th-100">Dernière connexion</th>
+                                <th className="th-150">Programmes</th>
+                                <th className="th-last th-100">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -91,9 +92,7 @@ const StructureContributors = () => {
                                     <td>{c.lastConnection}</td>
                                     <td className={style.programs}>{c.programs}</td>
                                     <td className={style.actions}>
-                                        <button className={style.iconBtn} aria-label="Voir">
-                                            <FiEye />
-                                        </button>
+                                        <EyesIcon />
                                     </td>
                                 </tr>
                             ))}

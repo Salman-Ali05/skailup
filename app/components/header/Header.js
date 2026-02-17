@@ -33,9 +33,9 @@ const Header = () => {
             <div></div>
 
             <div className={styles["header-right"]}>
-                <button className={styles["message-button"]}>
-                    <FiMessageCircle size={18} />
-                </button>
+                <div className={styles["message-button"]}>
+                    <FiMessageCircle size={25} />
+                </div>
 
                 <div className={styles["profile-container"]} ref={dropdownRef}>
                     <div className={styles.profile} onClick={toggleDropdown}>

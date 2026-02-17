@@ -8,12 +8,14 @@ import Link from "next/link";
 import styles from "./SideMenu.module.css";
 
 const menuItems = [
-    { label: "Accueil", icon: <FaHome />, href: "/structures/str_home" },
-    { label: "Intervenants", icon: <FaBullhorn />, href: "/structures/str_contributors" },
-    { label: "Projects", icon: <FaUsers />, href: "/structures/str_projects" },
-    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_programs" },
-    { label: "Ressources", icon: <FaFolder />, href: "/structures/str_resources" },
-    { label: "Paramètres", icon: <FaCog />, href: "/structures/str_settings" },
+    { label: "Accueil", icon: <FaHome />, href: "/structures/str_home", hidden: false },
+    { label: "Intervenants", icon: <FaBullhorn />, href: "/structures/str_contributors", hidden: false },
+    { label: "Projets", icon: <FaUsers />, href: "/structures/str_projects", hidden: false },
+    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_programs", hidden: false },
+    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_activity", hidden: true },
+    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_session", hidden: true },
+    { label: "Ressources", icon: <FaFolder />, href: "/structures/str_resources", hidden: false },
+    { label: "Paramètres", icon: <FaCog />, href: "/structures/str_settings", hidden: false },
 ];
 
 const SideMenu = () => {
@@ -39,7 +41,13 @@ const SideMenu = () => {
 
                 <div className={styles["side-menu-links"]}>
                     {menuItems.map((item, index) => {
-                        const isActive = pathname === item.href;
+                        if (item.hidden) return null;
+
+                        let isActive = pathname === item.href;
+
+                        if (item.label === "Programmes") {
+                            isActive = pathname.startsWith("/structures/str_activity") || pathname.startsWith("/structures/str_session") || pathname === item.href;
+                        }
 
                         return (
                             <Link

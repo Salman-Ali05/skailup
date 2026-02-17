@@ -16,16 +16,17 @@
 }
 
 .message-button {
-    background: none;
-    border: none;
+    background-color: #f3f4f6;
     cursor: pointer;
     padding: 6px;
-    border-radius: 6px;
-    transition: background 0.2s ease;
+    border-radius: 10px;
+    transition: 0.2s ease;
+    width: 42px;
+    text-align: center;
 }
 
 .message-button:hover {
-    background-color: #f3f4f6;
+    opacity: 0.7;
 }
 
 .profile-container {
@@ -49,14 +50,14 @@
 }
 
 .profile-name {
-    font-weight: 600;
-    font-size: 14px;
-    color: #0f172a;
+    font-weight: 700;
+    font-size: 16px;
 }
 
 .profile-role {
-    font-size: 13px;
-    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 300;
+    color: #b9b9b9;
     margin-top: 2px;
 }
 

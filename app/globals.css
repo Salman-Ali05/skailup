@@ -88,13 +88,18 @@ body {
 /* Buttons */
 button {
   height: 40px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
 }
 
 .buttons-primary {
   background-color: #1d4ed8;
   color: white;
   border: none;
-  border-radius: 8px;
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
@@ -110,7 +115,6 @@ button {
   background-color: white;
   color: #1d4ed8;
   border: 1px solid #1d4ed8;
-  border-radius: 8px;
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
@@ -126,7 +130,6 @@ button {
   background-color: #e7e7e7;
   color: #475569;
   border: none;
-  border-radius: 8px;
   padding: 10px 16px;
   font-size: 14px;
   font-weight: 500;
@@ -138,17 +141,109 @@ button {
   background-color: #d4d4d4;
 }
 
-/* Tables */
-.th-first, .th-last {
-  border-radius: 12px;
+/* Buttons Icons */
+.buttons-icon {
+  font-size: 24px;
 }
 
-.th-100px {
+/* Headers before tables */
+
+.headerActions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+
+.tabs {
+  display: flex;
+}
+
+.tab {
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: #666;
+  padding: 8px 16px;
+  border-bottom: 2px solid #F5F6F8;
+}
+
+.tab p {
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.tabActive {
+  color: #2450ff;
+  border-bottom: 2px solid #2450ff;
+}
+
+.tabActive p {
+  font-size: 18px;
+  color: #2450ff;
+  font-weight: 500;
+}
+
+
+
+/* Tables */
+.th-first {
+  border-top-left-radius: 12px;
+  border-bottom-left-radius: 12px;
+}
+
+.th-last {
+  border-top-right-radius: 12px;
+  border-bottom-right-radius: 12px;
+}
+
+tbody tr:first-child {
+  border: none;
+}
+
+.th-100 {
   min-width: 100px;
+}
+
+.th-150 {
+  min-width: 150px;
+}
+
+.th-200 {
+  min-width: 200px;
+}
+
+.th-250 {
+  min-width: 250px;
+}
+
+th, td {
+  text-align: left;
+  padding: 16px 18px;
+  font-size: 14px;
+}
+
+td {
+  border-bottom: 1px solid #f0f1f6;
+}
+
+.row-flex {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 /* P */
 
 p {
   color: #252525;
+}
+
+/* divs */
+
+.cursorOn{
+  cursor: pointer;
 }
