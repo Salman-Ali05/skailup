@@ -1,0 +1,123 @@
+.structure-content {
+    padding: 24px 40px;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.headerRow {
+    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+}
+
+.headerRow h2 {
+    margin: 0;
+}
+
+.tools {
+    display: flex;
+    gap: 15px;
+    align-items: center
+}
+
+.contributors-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+
+.contributors-table thead tr {
+    background: #f5f6f8;
+}
+
+.colContributor {
+    display: flex;
+    align-items: center
+}
+
+.emailCell {
+    color: #777;
+    max-width: 220px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
+}
+
+.roleBadge {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: 1px solid #d9e0ff;
+    color: #2450ff;
+    font-size: 13px;
+}
+
+.activity {
+    color: #ff8a5b
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.iconBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #9aa0b4
+}
+
+.switch {
+    flex: 0 0 auto;
+    /* <-- important */
+    position: relative;
+    width: 42px;
+    height: 22px;
+    background-color: #e4e7ec;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 0;
+}
+
+
+a.switch {
+    position: relative;
+    width: 42px;
+    height: 22px;
+    background-color: #e4e7ec;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    padding: 0;
+}
+
+.switchActive {
+    background-color: #2450ff;
+}
+
+.slider {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.2s ease;
+}
+
+.switchActive .slider {
+    transform: translateX(18px);
+}

@@ -1,34 +1,32 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import styles from "../../profile/Profile.module.css";
 
 export default function ProfileTabs() {
     const router = useRouter();
     const pathname = usePathname();
 
     const isInfo = pathname === "/profile/info";
+    const isFirm = pathname === "/profile/firm";
     const isMdp = pathname === "/profile/mdp";
 
     return (
-        <div className={styles.tabs}>
-            <button
-                className={`${styles.tab} ${isInfo ? styles.active : ""}`}
-                onClick={() => router.push("/profile/info")}
-            >
-                Infos personnelles
-            </button>
-
-            <button
-                className={`${styles.tab} ${isMdp ? styles.active : ""}`}
-                onClick={() => router.push("/profile/mdp")}
-            >
-                Mot de passe
-            </button>
-
-            <button className={styles.tab} onClick={() => router.push("/profile/sign")}>
-                Signature
-            </button>
+        <div className="tabs">
+            <div className={`tab ${isInfo ? "tabActive" : ""}`} onClick={() => router.push("/profile/info")}>
+                <p>
+                    Infos personnelles
+                </p>
+            </div>
+            <div className={`tab ${isFirm ? "tabActive" : ""}`} onClick={() => router.push("/profile/firm")}>
+                <p>
+                    Entreprise
+                </p>
+            </div>
+            <div className={`tab ${isMdp ? "tabActive" : ""}`} onClick={() => router.push("/profile/mdp")}>
+                <p>
+                    Mot de passe
+                </p>
+            </div>
         </div>
     );
 }

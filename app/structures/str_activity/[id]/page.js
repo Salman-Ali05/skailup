@@ -174,9 +174,11 @@ const StructureActivity = () => {
                                             <span className={style.roleBadge}>{activity.status}</span>
                                         </td>
 
-                                        <td className={style.actions}>
-                                            <EyesIcon />
-                                            <div className="cursorOn" onClick={() => handleViewActivity(activity.id)}><GoToIcon /></div>
+                                        <td>
+                                            <div className={style.actions}>
+                                                <div><EyesIcon /></div>
+                                                <div className="cursorOn" onClick={() => handleViewActivity(activity.id)}><GoToIcon /></div>
+                                            </div>
                                         </td>
                                     </tr>
                                 );

@@ -161,9 +161,11 @@ const StructurePrograms = () => {
                                             <span className={style.roleBadge}>{program.status}</span>
                                         </td>
 
-                                        <td className={style.actions}>
-                                            <EyesIcon />
-                                            <div className="cursorOn" onClick={() => handleViewProgram(program.id)}><GoToIcon /></div>
+                                        <td>
+                                            <div className={style.actions}>
+                                                <div><EyesIcon /></div>
+                                                <div className="cursorOn" onClick={() => handleViewProgram(program.id)}><GoToIcon /></div>
+                                            </div>
                                         </td>
                                     </tr>
                                 );

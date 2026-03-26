@@ -67,7 +67,8 @@ const StructureSession = () => {
         <div className={style["structure-layout"]}>
             <div className={style["structure-main"]}>
                 <div className={style["structure-content"]}>
-                    <div className="cursorOn" onClick={() => routeTo("/structures/str_programs")}>
+                    <div className="cursorOn" onClick={() => routeTo("/structures/str_activity/1")}>
+                        {/* en dur pour le moment pour qu'après je mette activity.ProgramID */}
                         <GoBackIcon />
                     </div>
                     <div className={style.topSection}>
@@ -77,7 +78,7 @@ const StructureSession = () => {
                                 <p className={style.description}>Description : Does it displays well ?</p>
                             </div>
                             <button className={style.buttonActivityTrack}>
-                                <EyesIcon color="#1d4ed8"/>&nbsp; Rapport de l'activité
+                                <EyesIcon color="#1d4ed8" />&nbsp; Rapport de l'activité
                             </button>
                         </div>
 
@@ -121,7 +122,7 @@ const StructureSession = () => {
 
                 <div className={style["structure-content"]}>
                     <div className={style.headerRow}>
-                    <h2>Sessions</h2>
+                        <h2>Sessions</h2>
                         <div className={style.tools}>
                             <FilterContributors />
                             <button className="buttons-primary-reversed">
@@ -162,15 +163,17 @@ const StructureSession = () => {
                                         <td>
                                             <span className={style.roleBadge}>{status}</span>
                                         </td>
-                                        <td className={style.actions}>
-                                            <div className="cursorOn">
-                                                <EyesIcon />
-                                            </div>
-                                            <div className="cursorOn">
-                                                <PenIcon />
-                                            </div>
-                                            <div className="cursorOn">
-                                                <DeleteIcon />
+                                        <td>
+                                            <div className={style.actions}>
+                                                <div className="cursorOn">
+                                                    <EyesIcon />
+                                                </div>
+                                                <div className="cursorOn">
+                                                    <PenIcon />
+                                                </div>
+                                                <div className="cursorOn">
+                                                    <DeleteIcon />
+                                                </div>
                                             </div>
                                         </td>
                                     </tr>

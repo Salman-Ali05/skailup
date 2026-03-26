@@ -59,7 +59,7 @@ const Header = () => {
                                 <p className={styles["name"]}>Solène SEGUIN</p>
                                 <p className={styles["email"]}>example@gmail.com</p>
 
-                                <div className={styles["entreprise"]}>
+                                <div className={styles["entreprise"]} onClick={() => routeTo('/profile/firm')}>
                                     <Image src="/logoproj.jpg" alt="logo projet" width={40} height={40} className={styles["logo-entreprise"]} />
                                     <div>
                                         <p className={styles["entreprise-name"]}>MieuxReussir</p>
@@ -69,15 +69,15 @@ const Header = () => {
                             </div>
 
                             <div className={styles["dropdown-actions"]}>
-                                <button className={styles["dropdown-btn"]} onClick={() => {
+                                <div className={styles["dropdown-btn"]} onClick={() => {
                                     setOpen(false);
                                     routeTo('/profile/info');
                                 }}>
                                     <FiUser /> <span>Profile</span>
-                                </button>
-                                <button className={styles["dropdown-btn"]} onClick={() => routeTo('/login')}>
+                                </div>
+                                <div className={styles["dropdown-btn"]} onClick={() => routeTo('/login')}>
                                     <FiLogOut /> <span>Déconnexion</span>
-                                </button>
+                                </div>
                             </div>
                         </div>
                     )}

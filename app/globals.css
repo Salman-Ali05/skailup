@@ -247,3 +247,8 @@ p {
 .cursorOn{
   cursor: pointer;
 }
+
+.flex {
+  display: flex;
+  gap: 8px;
+}
