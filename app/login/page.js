@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import AppName from '../components/AppName';
 import styles from "./login.module.css";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEye } from '@fortawesome/free-solid-svg-icons';
+import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { useRouteTo } from "../utils/router";
 import { useUser } from "@/app/utils/contexts/userContext";
 
@@ -16,6 +16,12 @@ const LoginPage = () => {
     const [error, setError] = useState('');
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const { loginUser } = useUser();
+
+    const [revealPassword, setRevealPassword] = useState(false);
+
+    const toggleRevealPassword = () => {
+        setRevealPassword(!revealPassword);
+    }
 
     const onSubmit = async (e) => {
         e.preventDefault();
@@ -89,15 +95,15 @@ const LoginPage = () => {
                     </div>
 
                     <div className={styles["form-group"]}>
-                        <div className={styles["password-label-container"]}>
+                        <div className={styles["password-label-container"]} onClick={toggleRevealPassword}>
                             <label>Mot de passe</label>
                             <div className={styles["reveal-password"]}>
-                                <span><p>Afficher</p></span>
-                                <span><FontAwesomeIcon icon={faEye} className={styles["icons icons-gray-light"]} /></span>
+                                <span><p>Afficher </p></span>
+                                <span>{revealPassword ? <FontAwesomeIcon icon={faEyeSlash} className={styles["icons icons-gray-light"]} /> : <FontAwesomeIcon icon={faEye} className={styles["icons icons-gray-light"]} />}</span>
                             </div>
                         </div>
                         <input
-                            type="password"
+                            type={revealPassword ? "text" : "password"}
                             className="inputs"
                             placeholder="Mot de passe"
                             value={password}
