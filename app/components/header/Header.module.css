@@ -8,6 +8,13 @@
     height: 90px;
 }
 
+
+.side-menu-header {
+    display: flex;
+    margin: 9px 0px 9px 4px;
+    align-items: center;
+}
+
 .header-right {
     display: flex;
     align-items: center;
@@ -68,9 +75,9 @@
     right: 0;
     top: 48px;
     background-color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    box-shadow: rgba(208, 208, 196, 0.48) 0px 7px 24px -2px;
     border-radius: 16px;
-    width: 260px;
+    width: 220px;
     z-index: 100;
     overflow: hidden;
     display: flex;

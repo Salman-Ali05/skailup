@@ -1,22 +1,68 @@
 .side-menu {
+    margin-top: 90px;
     display: flex;
     flex-direction: column;
     width: 260px;
     height: 100vh;
     background-color: #fff;
+    transition: width 0.3s ease;
 }
 
-.side-menu-header {
-    display: flex;
-    align-items: center;
-    padding: 16px 24px
+/* état réduit */
+.side-menu.collapsed {
+    width: 80px;
 }
 
 .side-menu-links {
     display: flex;
     flex-direction: column;
-    padding: 20px 24px 44px;
+    padding: 16px 24px;
     gap: 8px;
+}
+
+.side-menu-toggle {
+    display: flex;
+    justify-content: end;
+    width: 100%;
+}
+
+.menu-toggle {
+    height: 30px;
+    border-radius: 12px;
+    background-color: transparent;
+    border: 1px solid #30303626;
+    cursor: pointer;
+    padding: 4px 14px;
+    color: #303036;
+    display: flex;
+    align-items: center;
+    text-align: center;
+    transition: ease 0.2s;
+}
+
+.menu-toggle:hover {
+    background-color: #f0f0f0;
+}
+
+/* cacher le texte */
+.side-menu-text {
+    transition: opacity 0.2s ease;
+}
+
+.hidden {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+}
+
+/* centrer les icônes quand réduit */
+.side-menu.collapsed .side-menu-link {
+    justify-content: center;
+    padding-left: 0;
+}
+
+.side-menu.collapsed .side-menu-icon {
+    margin-right: 0;
 }
 
 .side-menu-link {

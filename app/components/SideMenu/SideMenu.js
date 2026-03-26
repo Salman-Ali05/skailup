@@ -1,9 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { usePathname } from "next/navigation";
 import { FaHome, FaBullhorn, FaUsers, FaRocket, FaFolder, FaCog } from "react-icons/fa";
-import Image from "next/image";
 import Link from "next/link";
 import styles from "./SideMenu.module.css";
 
@@ -20,49 +19,48 @@ const menuItems = [
 
 const SideMenu = () => {
     const pathname = usePathname();
+    const [collapsed, setCollapsed] = useState(false);
 
     return (
-        <div className={styles["side-menu"]}>
-            <div className={styles["side-menu-top"]}>
-                <div className={styles["side-menu-header"]}>
-                    <Image
-                        src="/logoonly.png"
-                        alt="Logo Structure"
-                        width={30}
-                        height={30}
-                    />
-                    <Image
-                        src="/textonlylogo.png"
-                        alt="Logo Structure"
-                        width={150}
-                        height={40}
-                    />
-                </div>
+        <div className={`${styles["side-menu"]} ${collapsed ? styles.collapsed : ""}`}>
 
-                <div className={styles["side-menu-links"]}>
-                    {menuItems.map((item, index) => {
-                        if (item.hidden) return null;
-
-                        let isActive = pathname === item.href;
-
-                        if (item.label === "Programmes") {
-                            isActive = pathname.startsWith("/structures/str_activity") || pathname.startsWith("/structures/str_session") || pathname === item.href;
-                        }
-
-                        return (
-                            <Link
-                                href={item.href}
-                                key={index}
-                                className={`${styles["side-menu-link"]} ${isActive ? styles.active : ""}`}
-                            >
-                                <span className={styles["side-menu-icon"]}>{item.icon}</span>
-                                <span className={styles["side-menu-text"]}>{item.label}</span>
-                            </Link>
-                        );
-                    })}
+            <div className={styles["side-menu-toggle"]}>
+                <div
+                    className={styles["menu-toggle"]}
+                    onClick={() => setCollapsed(!collapsed)}
+                >
+                    {collapsed ? ">" : "<"}
                 </div>
             </div>
-        </div>
+
+            <div className={styles["side-menu-links"]}>
+                {menuItems.map((item, index) => {
+                    if (item.hidden) return null;
+
+                    let isActive = pathname === item.href;
+
+                    if (item.label === "Programmes") {
+                        isActive = pathname.startsWith("/structures/str_activity") || pathname.startsWith("/structures/str_session") || pathname === item.href;
+                    }
+
+                    return (
+                        <Link
+                            href={item.href}
+                            key={index}
+                            className={`${styles["side-menu-link"]} ${isActive ? styles.active : ""}`}
+                        >
+                            <span className={styles["side-menu-icon"]}>{item.icon}</span>
+                            <span
+                                className={`${styles["side-menu-text"]} ${collapsed ? styles.hidden : ""
+                                    }`}
+                            >
+                                {item.label}
+                            </span>
+                        </Link>
+                    );
+                })}
+            </div>
+        </div >
     );
 };
 

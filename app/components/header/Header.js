@@ -30,7 +30,16 @@ const Header = () => {
 
     return (
         <header className={styles["header-container"]}>
-            <div></div>
+            <div className={styles["side-menu-top"]}>
+                <div className={styles["side-menu-header"]}>
+                    <Image
+                        src="/skailup_logo_transparent.png"
+                        alt="Logo Structure"
+                        width={200}
+                        height={68}
+                    />
+                </div>
+            </div>
 
             <div className={styles["header-right"]}>
                 <div className={styles["message-button"]}>
@@ -48,16 +57,16 @@ const Header = () => {
                         />
                         <div className={styles["profile-info"]}>
                             <p className={styles["profile-name"]}>{userDetails?.first_name} {userDetails?.last_name}</p>
-                            <p className={styles["profile-role"]}>Compte {userDetails?.os_type_user.lang_fr}</p>
+                            <p className={styles["profile-role"]}>{userDetails?.os_type_user.lang_fr}</p>
                         </div>
                     </div>
 
                     {open && (
                         <div className={styles["dropdown-menu"]}>
                             <div className={styles["dropdown-user"]}>
-                                <p className={styles["role"]}>Compte Structure</p>
-                                <p className={styles["name"]}>Solène SEGUIN</p>
-                                <p className={styles["email"]}>example@gmail.com</p>
+                                <p className={styles["role"]}>Compte {userDetails?.os_type_user.lang_fr}</p>
+                                <p className={styles["name"]}>{userDetails?.first_name} {userDetails?.last_name}</p>
+                                <p className={styles["email"]}>{user?.email}</p>
 
                                 <div className={styles["entreprise"]} onClick={() => routeTo('/profile/firm')}>
                                     <Image src="/logoproj.jpg" alt="logo projet" width={40} height={40} className={styles["logo-entreprise"]} />
