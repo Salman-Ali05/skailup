@@ -194,6 +194,7 @@
     transition: background-color 0.2s ease;
     border: none;
 }
+
 .buttonActivityTrack:hover {
     background-color: rgba(29, 78, 216, 0.4);
 }

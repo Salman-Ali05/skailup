@@ -5,25 +5,56 @@ import { usePathname } from "next/navigation";
 import { FaHome, FaBullhorn, FaUsers, FaRocket, FaFolder, FaCog } from "react-icons/fa";
 import Link from "next/link";
 import styles from "./SideMenu.module.css";
-
-const menuItems = [
-    { label: "Accueil", icon: <FaHome />, href: "/structures/str_home", hidden: false },
-    { label: "Intervenants", icon: <FaBullhorn />, href: "/structures/str_contributors", hidden: false },
-    { label: "Projets", icon: <FaUsers />, href: "/structures/str_projects", hidden: false },
-    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_programs", hidden: false },
-    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_activity", hidden: true },
-    { label: "Programmes", icon: <FaRocket />, href: "/structures/str_session", hidden: true },
-    { label: "Ressources", icon: <FaFolder />, href: "/structures/str_resources", hidden: false },
-    { label: "Paramètres", icon: <FaCog />, href: "/structures/str_settings", hidden: false },
-];
+import { useUser } from "@/app/utils/contexts/userContext";
 
 const SideMenu = () => {
+    const { userDetails } = useUser();
+    const typeProfil = userDetails?.os_type_user?.code?.toLowerCase();
+
+    const menuItems = [
+        {
+            label: "Accueil",
+            icon: <FaHome />,
+            href: `/${typeProfil}/home`,
+            profiles: ["structure", "project", "contributor"],
+        },
+        {
+            label: "Intervenants",
+            icon: <FaBullhorn />,
+            href: `/${typeProfil}/contributors`,
+            profiles: ["structure"],
+        },
+        {
+            label: "Projets",
+            icon: <FaUsers />,
+            href: `/${typeProfil}/projects`,
+            profiles: ["structure"],
+        },
+        {
+            label: "Programmes",
+            icon: <FaRocket />,
+            href: `/${typeProfil}/program`,
+            profiles: ["structure", "project", "contributor"],
+        },
+        {
+            label: "Ressources",
+            icon: <FaFolder />,
+            href: `/${typeProfil}/resources`,
+            profiles: ["structure", "project", "contributor"],
+        },
+        {
+            label: "Paramètres",
+            icon: <FaCog />,
+            href: `/${typeProfil}/settings`,
+            profiles: ["structure"],
+        },
+    ];
+
     const pathname = usePathname();
     const [collapsed, setCollapsed] = useState(false);
 
     return (
         <div className={`${styles["side-menu"]} ${collapsed ? styles.collapsed : ""}`}>
-
             <div className={styles["side-menu-toggle"]}>
                 <div
                     className={styles["menu-toggle"]}
@@ -34,33 +65,35 @@ const SideMenu = () => {
             </div>
 
             <div className={styles["side-menu-links"]}>
-                {menuItems.map((item, index) => {
-                    if (item.hidden) return null;
+                {menuItems
+                    .filter((item) => item.profiles.includes(typeProfil))
+                    .map((item, index) => {
+                        let isActive = pathname === item.href;
 
-                    let isActive = pathname === item.href;
+                        if (item.label === "Programmes") {
+                            isActive =
+                                pathname.startsWith(`/${typeProfil}/program`) ||
+                                pathname.startsWith(`/${typeProfil}/activity`) ||
+                                pathname.startsWith(`/${typeProfil}/session`);
+                        }
 
-                    if (item.label === "Programmes") {
-                        isActive = pathname.startsWith("/structures/str_activity") || pathname.startsWith("/structures/str_session") || pathname === item.href;
-                    }
-
-                    return (
-                        <Link
-                            href={item.href}
-                            key={index}
-                            className={`${styles["side-menu-link"]} ${isActive ? styles.active : ""}`}
-                        >
-                            <span className={styles["side-menu-icon"]}>{item.icon}</span>
-                            <span
-                                className={`${styles["side-menu-text"]} ${collapsed ? styles.hidden : ""
-                                    }`}
+                        return (
+                            <Link
+                                href={item.href}
+                                key={index}
+                                className={`${styles["side-menu-link"]} ${isActive ? styles.active : ""}`}
                             >
-                                {item.label}
-                            </span>
-                        </Link>
-                    );
-                })}
+                                <span className={styles["side-menu-icon"]}>{item.icon}</span>
+                                <span
+                                    className={`${styles["side-menu-text"]} ${collapsed ? styles.hidden : ""}`}
+                                >
+                                    {item.label}
+                                </span>
+                            </Link>
+                        );
+                    })}
             </div>
-        </div >
+        </div>
     );
 };
 

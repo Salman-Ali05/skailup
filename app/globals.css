@@ -44,13 +44,15 @@ body {
 
 /* LAYOUT STRUCTURE */
 .layout-wrapper {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
+  min-height: 100vh;
 }
 
 .layout-content {
-  flex: 1;
+  margin-top: 90px;
+  /* hauteur du header */
+  margin-left: 260px;
+  /* largeur du side menu */
+  min-height: calc(100vh - 90px);
   display: flex;
   flex-direction: column;
 }
@@ -244,7 +246,7 @@ p {
 
 /* divs */
 
-.cursorOn{
+.cursorOn {
   cursor: pointer;
 }
 

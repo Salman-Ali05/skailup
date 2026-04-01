@@ -1,11 +1,16 @@
 .side-menu {
-    margin-top: 90px;
+    position: fixed;
+    top: 90px;
+    /* juste sous le header */
+    left: 0;
+    width: 260px;
+    height: calc(100vh - 90px);
     display: flex;
     flex-direction: column;
-    width: 260px;
-    height: 100vh;
     background-color: #fff;
     transition: width 0.3s ease;
+    z-index: 900;
+    height: 100%;
 }
 
 /* état réduit */
@@ -44,7 +49,6 @@
     background-color: #f0f0f0;
 }
 
-/* cacher le texte */
 .side-menu-text {
     transition: opacity 0.2s ease;
 }
@@ -55,7 +59,6 @@
     overflow: hidden;
 }
 
-/* centrer les icônes quand réduit */
 .side-menu.collapsed .side-menu-link {
     justify-content: center;
     padding-left: 0;
@@ -79,7 +82,7 @@
 .side-menu-link.active {
     color: #1B43D0;
     border-left: 6px solid #1B43D0;
-    border-radius: 5px 5px 5px 5px;
+    border-radius: 5px;
 }
 
 .side-menu-link:hover {

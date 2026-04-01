@@ -2,9 +2,9 @@
 
 import SessionTable from "@/app/components/SessionTable/SessionTable";
 import React from "react";
-import style from "./str_home.module.css";
+import style from "./home.module.css";
 
-const StructureHome = () => {
+const ProjectsHome = () => {
   return (
     <div className={style["str-container"]}>
       <div className={style["str-content"]}>
@@ -15,4 +15,4 @@ const StructureHome = () => {
   );
 };
 
-export default StructureHome;
+export default ProjectsHome;

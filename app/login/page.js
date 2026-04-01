@@ -53,7 +53,19 @@ const LoginPage = () => {
                     os_type_user: data.os_type_user,
                 });
             }
-            routeTo('/structures/str_home');
+            switch (data?.user_details?.os_type_user.code) {
+                case 'Structure':
+                    routeTo('/structure/home');
+                    break;
+                case 'Contributor':
+                    routeTo('/contributor/home');
+                    break;
+                case 'Project':
+                    routeTo('/project/home');
+                    break;
+                default:
+                    routeTo('/');
+            }
         } catch (err) {
             setError(err.message || 'An error occurred');
         } finally {
