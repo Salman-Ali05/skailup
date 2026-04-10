@@ -26,17 +26,17 @@
     align-items: center
 }
 
-.contributors-table {
+.projects-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 8px;
 }
 
-.contributors-table thead tr {
+.projects-table thead tr {
     background: #f5f6f8;
 }
 
-.colContributor {
+.colProject {
     display: flex;
     align-items: center
 }
@@ -66,10 +66,9 @@
 
 .roleBadge {
     display: inline-block;
-    padding: 4px 8px 4px 8px;
-    border-radius: 6px;
+    padding: 6px 10px;
+    border-radius: 12px;
     border: 1px solid #d9e0ff;
-    border-color: #2450ff;
     color: #2450ff;
     font-size: 13px;
 }
@@ -87,10 +86,10 @@
 
 @media (max-width: 900px) {
 
-    .contributors-table th:nth-child(4),
-    .contributors-table td:nth-child(4),
-    .contributors-table th:nth-child(5),
-    .contributors-table td:nth-child(5) {
+    .projects-table th:nth-child(4),
+    .projects-table td:nth-child(4),
+    .projects-table th:nth-child(5),
+    .projects-table td:nth-child(5) {
         display: none;
     }
 }

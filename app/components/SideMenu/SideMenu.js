@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { usePathname } from "next/navigation";
-import { FaHome, FaBullhorn, FaUsers, FaRocket, FaFolder, FaCog } from "react-icons/fa";
+import { FaHome, FaBullhorn, FaUsers, FaRocket, FaFolder, FaCog, FaCheck } from "react-icons/fa";
 import Link from "next/link";
 import styles from "./SideMenu.module.css";
 import { useUser } from "@/app/utils/contexts/userContext";
@@ -40,6 +40,12 @@ const SideMenu = () => {
             label: "Ressources",
             icon: <FaFolder />,
             href: `/${typeProfil}/resources`,
+            profiles: ["structure", "project", "contributor"],
+        },
+        {
+            label: "Preuves d'activités",
+            icon: <FaCheck />,
+            href: `/${typeProfil}/activity-proof`,
             profiles: ["structure", "project", "contributor"],
         },
         {
