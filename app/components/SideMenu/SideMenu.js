@@ -6,6 +6,7 @@ import { FaHome, FaBullhorn, FaUsers, FaRocket, FaFolder, FaCog, FaCheck } from 
 import Link from "next/link";
 import styles from "./SideMenu.module.css";
 import { useUser } from "@/app/utils/contexts/userContext";
+import { BsFileBarGraph } from "react-icons/bs";
 
 const SideMenu = () => {
     const { userDetails } = useUser();
@@ -45,7 +46,13 @@ const SideMenu = () => {
         {
             label: "Preuves d'activités",
             icon: <FaCheck />,
-            href: `/${typeProfil}/activity-proof`,
+            href: `/${typeProfil}/activity_proof`,
+            profiles: ["structure", "project", "contributor"],
+        },
+        {
+            label: "Suivi budgétaire",
+            icon: <BsFileBarGraph />,
+            href: `/${typeProfil}/budget_track`,
             profiles: ["structure", "project", "contributor"],
         },
         {
@@ -76,11 +83,15 @@ const SideMenu = () => {
                     .map((item, index) => {
                         let isActive = pathname === item.href;
 
+                        const isInSection = (section) =>
+                            pathname === `/${typeProfil}/${section}` ||
+                            pathname.startsWith(`/${typeProfil}/${section}/`);
+
                         if (item.label === "Programmes") {
                             isActive =
-                                pathname.startsWith(`/${typeProfil}/program`) ||
-                                pathname.startsWith(`/${typeProfil}/activity`) ||
-                                pathname.startsWith(`/${typeProfil}/session`);
+                                isInSection("program") ||
+                                isInSection("activity") ||
+                                isInSection("session");
                         }
 
                         return (

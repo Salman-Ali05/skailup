@@ -153,6 +153,13 @@ button {
   flex-direction: column;
   gap: 16px;
 }
+.panel h3 {
+  color:#0435bb
+}
+.small-text {
+  color: #b4b4b4;
+  font-size: 12px;
+}
 
 /* Form actions */
 .button-reset {

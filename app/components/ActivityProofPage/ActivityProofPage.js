@@ -1,13 +1,19 @@
 "use client";
 
 import React from "react";
-import { FiPlusCircle } from "react-icons/fi";
-import style from "./activity-proof.module.css";
-import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
-import EyesIcon from "@/app/components/Icons/Eyes";
-import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
+import style from "./ActivityProofPage.module.css";
 
-const StructureProjects = () => {
+const ActivityProofPage = ({
+    activitiesproof = [],
+    onViewAcitivityProof,
+    onCreateActivityProof,
+}) => {
+    const formatDate = (iso) => {
+        if (!iso) return "-";
+        const [y, m, d] = iso.split("-");
+        return `${d}/${m}/${y}`;
+    };
+
     return (
         <div className={style["structure-layout"]}>
             <div className={style["structure-main"]}>
@@ -77,4 +83,4 @@ const StructureProjects = () => {
     );
 };
 
-export default StructureProjects;
+export default ActivityProofPage;
