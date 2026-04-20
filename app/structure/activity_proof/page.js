@@ -8,11 +8,11 @@ import ActivityProofPage from "@/app/components/ActivityProofPage/ActivityProofP
 const ActivityProofs = () => {
     const router = useRouter();
 
-    const handleViewProgram = (programId) => {
-        router.push(`/structures/activity/${programId}`);
+    const handleViewActivityProof = (activityProofId) => {
+        router.push(`/structures/activity/${activityProofId}`);
     };
 
-    const samplePrograms = [
+    const sampleActivitiesProof = [
         {
             id: 1,
             Param_Name: "Croissance+ Cohorte15",
@@ -62,13 +62,15 @@ const ActivityProofs = () => {
         <div className={style["structure-layout"]}>
             <div className={style["structure-main"]}>
                 <ActivityProofPage
-                    programs={samplePrograms}
-                    onViewProgram={handleViewProgram}
-                    onCreateProgram={() => { }}
+                    activitiesProof={sampleActivitiesProof}
+                    onViewActivityProof={handleViewActivityProof}
+                    onCreateActivityProof={() => { }}
                 />
             </div>
         </div>
     );
+
+    
 };
 
 export default ActivityProofs;
