@@ -1,0 +1,52 @@
+.structure-content {
+    padding: 24px;
+    justify-content: center;
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: #ffffff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    height: 100vh;;
+}
+
+.app-name-form {
+  width: 100%;
+  height: 100vh;
+  background: linear-gradient(180deg, #1e3a8a, #3b82f6);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  text-align: center;
+  flex-direction: column;
+}
+
+.app-name-form h1 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.app-name-form p {
+  font-size: 24px;
+  opacity: 0.9;
+}
+
+.fieldRow {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    /* ne bouge pas horizontalement */
+    align-items: center;
+}
+
+.fieldGroup {
+    flex: 1;
+    /* chaque champ prend 50% - gap */
+    min-width: 0;
+    /* evite les debordements */
+    display: flex;
+    flex-direction: column;
+}
