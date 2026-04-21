@@ -16,6 +16,9 @@ const Home = ({
     };
 
     return (
+        <div className={style["structure-layout"]}>
+            <div className={style["structure-main"]}>
+                <div className={style["structure-content"]}>
                     <div className={style.headerRow}>
                         <div className={style.mainContainer}>
                             <div className={style.fieldRow}>
@@ -93,6 +96,9 @@ const Home = ({
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
