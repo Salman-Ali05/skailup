@@ -9,9 +9,8 @@ export default function Page() {
                 <div className={style.fieldGroup}>
                     <div className={style["app-name-form"]}>
                         <h1>Bienvenue sur SkailUp</h1>
-                        <p>Site en cours de construction</p>
                         <div className={style["app-name-bottomed"]} >
-                            <AppName size={52} logo={"./skailup_logo_only.png"} />
+                            <AppName style={{ color: '#FFFFFF' }} size={52} logo={"../../skailup_logo_only.png"} />
                         </div>
                     </div>
                 </div>
