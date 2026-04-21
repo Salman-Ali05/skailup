@@ -9,7 +9,7 @@ const StructurePrograms = () => {
     const router = useRouter();
 
     const handleViewProgram = (programId) => {
-        router.push(`/structures/activity/${programId}`);
+        router.push(`/structure/activity/${programId}`);
     };
 
     const samplePrograms = [
