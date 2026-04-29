@@ -81,6 +81,7 @@ body {
   background-color: #fff;
   color: #0f172a;
   flex: 1;
+  height: 44px;
 }
 
 .inputs::placeholder {

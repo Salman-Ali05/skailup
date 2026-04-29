@@ -1,11 +1,13 @@
 "use client";
 
-import React from "react";
+import React, { use, useState } from "react";
 import Image from "next/image";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./str_contributors.module.css";
+import stylePopup from "@/app/components/Popup/PopupContent.module.css";
 import FilterContributors from "@/app/components/Filters/FilterContributors/FilterContributor";
 import EyesIcon from "@/app/components/Icons/Eyes";
+import Popup from "@/app/components/Popup/Popup";
 
 const sampleContributors = [
     {
@@ -40,9 +42,55 @@ const sampleContributors = [
     },
 ];
 
+
 const StructureContributors = () => {
+    const [openPopup, setOpenPopup] = useState(false);
     return (
         <div className={style["structure-layout"]}>
+            <Popup open={openPopup} onClose={() => setOpenPopup(false)}>
+                <form className={stylePopup.form}>
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>Nom<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                        <div className={stylePopup.field}>
+                            <label>Prénom<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                    </div>
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>Mail<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                        <div className={stylePopup.field}>
+                            <label>Société<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                    </div>
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>Rôle<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                        <div className={stylePopup.field}>
+                            <label>Statut<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                        <div className={stylePopup.field}>
+                            <label>Situation<span>*</span></label>
+                            <input className="inputs" />
+                        </div>
+                    </div>
+
+                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                        Inviter
+                    </button>
+                </form>
+            </Popup>
             <div className={style["structure-main"]}>
                 <div className={style["structure-content"]}>
                     <h2>Intervenants</h2>
@@ -56,7 +104,9 @@ const StructureContributors = () => {
 
                             <div className={style.tools}>
                                 <FilterContributors />
-                                <button className="buttons-primary-reversed"><FiPlusCircle className="buttons-icon" /> Nouvel intervenant</button>
+                                <button className="buttons-primary-reversed" onClick={() => setOpenPopup(true)}>
+                                    <FiPlusCircle className="buttons-icon" /> Nouvel intervenant
+                                </button>
                             </div>
                         </div>
                     </div>
