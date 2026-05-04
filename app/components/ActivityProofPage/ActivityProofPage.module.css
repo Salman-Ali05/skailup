@@ -90,6 +90,8 @@
   border-color: #252525;
 }
 
+
+
 /* Elements */
 .dropDown {
     position: relative;
@@ -178,5 +180,3 @@
   flex-direction: row;
   gap: 8px;
 }
-
-
