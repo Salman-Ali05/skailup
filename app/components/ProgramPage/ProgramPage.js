@@ -10,14 +10,71 @@ import GoToIcon from "@/app/components/Icons/GoTo";
 
 const ProgramPage = ({
     programs = [],
+    programProjects = [],
+    projects = [],
+    programContributors = [],
+    contributors = [],
+    tagParamStructures = [],
     onViewProgram,
-    onCreateProgram,
+    onCreateProgram = () => {},
 }) => {
     const formatDate = (iso) => {
         if (!iso) return "-";
         const [y, m, d] = iso.split("-");
         return `${d}/${m}/${y}`;
     };
+    
+    const projectNameById = React.useMemo(() => {
+        const map = new Map();
+        projects.forEach((project) => {
+            if (project && project.id) {
+                map.set(project.id, project.name || "-");
+            }
+        });
+        return map;
+    }, [projects]);
+
+    const programProjectNames = React.useMemo(() => {
+        return programProjects.reduce((acc, link) => {
+            if (!link || !link.id_program || !link.id_project) return acc;
+            const name = projectNameById.get(link.id_project);
+            if (!name) return acc;
+            if (!acc[link.id_program]) acc[link.id_program] = [];
+            acc[link.id_program].push(name);
+            return acc;
+        }, {});
+    }, [programProjects, projectNameById]);
+
+    const tagParamValueById = React.useMemo(() => {
+        const map = new Map();
+        tagParamStructures.forEach((tag) => {
+            if (!tag || !tag.id) return;
+            const value = tag.label || tag.name || tag.description || tag.tag || tag.value;
+            map.set(tag.id, value || "-");
+        });
+        return map;
+    }, [tagParamStructures]);
+
+    const contributorNameById = React.useMemo(() => {
+        const map = new Map();
+        contributors.forEach((contributor) => {
+            if (contributor && contributor.id) {
+                map.set(contributor.id, contributor.name || "-");
+            }
+        });
+        return map;
+    }, [contributors]);
+
+    const programContributorNames = React.useMemo(() => {
+        return programContributors.reduce((acc, link) => {
+            if (!link || !link.id_program || !link.id_contributor) return acc;
+            const name = contributorNameById.get(link.id_contributor);
+            if (!name) return acc;
+            if (!acc[link.id_program]) acc[link.id_program] = [];
+            acc[link.id_program].push(name);
+            return acc;
+        }, {});
+    }, [programContributors, contributorNameById]);
 
     return (
         <div className={style["structure-content"]}>
@@ -67,33 +124,25 @@ const ProgramPage = ({
                     {programs.map((program) => {
                         return (
                             <tr key={program.id}>
-                                <td className={style.colContributor}>
-                                    {program.Param_Name}
+                                <td>
+                                    {program.id_param_structure ? (
+                                        <span>
+                                            {" "}{tagParamValueById.get(program.id_param_structure)}
+                                        </span>
+                                    ) : null} <br></br>
+                                    {program.description}
                                 </td>
-
+                                
                                 <td>{formatDate(program.date_start)}</td>
 
                                 <td>{formatDate(program.date_end)}</td>
 
                                 <td>
-                                    <div className="row-flex">
-                                        <ListUsersInSession users={program.Contributors || []} />
-                                    </div>
+                                    {(programContributorNames[program.id] || ["-"]).join(", ")}
                                 </td>
 
-                                <td className={style.programs}>
-                                    <div className={style.projectBadges}>
-                                        {(program.Projects || []).slice(0, 2).map((p, idx) => (
-                                            <span key={idx} className={style.projectChip}>
-                                                {p}
-                                            </span>
-                                        ))}
-                                        {(program.Projects || []).length > 2 && (
-                                            <span className={style.projectChip}>
-                                                +{program.Projects.length - 2}
-                                            </span>
-                                        )}
-                                    </div>
+                                <td>
+                                    {(programProjectNames[program.id] || ["-"]).join(", ")}
                                 </td>
 
                                 <td>
@@ -118,6 +167,7 @@ const ProgramPage = ({
                     })}
                 </tbody>
             </table>
+            
         </div>
     );
 };

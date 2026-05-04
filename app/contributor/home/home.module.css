@@ -203,6 +203,13 @@
     flex-direction: column;
 }
 
+.shortcutGrid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
+}
+
 .cohorteTagGroup {
     display: flex;
     align-items: center;
@@ -229,6 +236,23 @@
 
 .buttonsArrow:hover {
   background-color: #d1d1d1;
+}
+
+.buttons-shortcut {
+  background-color: #eef4ff;
+  color: rgb(0, 0, 0);
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  height: 100;
+  width: 250px;
+}
+
+.buttons-shortcut:hover {
+  background-color: #d9e1f0;
 }
 
 /* Texts */
