@@ -29,38 +29,41 @@ const StructureContributors = () => {
         Tag3: [],
     });
 
-    const sampleContributors = [
-        {
-            id: 1,
-            name: "Florino JEAN",
-            contrib_name: "SOS Business",
-            email: "demo.intervenant@skailup.com",
-            role: "Multi-rôle",
-            lastConnection: "30/10/2025",
-            programs: "7 programmes",
-            avatar: "/avatar1.jpg",
-        },
-        {
-            id: 2,
-            name: "Dipo BANDO",
-            contrib_name: "Za'Earth",
-            email: "test.i2@skailup.com",
-            role: "Coach",
-            lastConnection: "01/09/2025",
-            programs: "Prévisions+",
-            avatar: "/avatar2.jpg",
-        },
-        {
-            id: 3,
-            name: "Inter VENANT",
-            contrib_name: "Cont'Rib",
-            email: "test.i1@skailup.com",
-            role: "Coach",
-            lastConnection: "13/06/2025",
-            programs: "3 programmes",
-            avatar: "/avatar3.jpg",
-        },
-    ];
+    const [contributors, setContributors] = useState([]);
+
+
+    // const sampleContributors = [
+    //     {
+    //         id: 1,
+    //         name: "Florino JEAN",
+    //         contrib_name: "SOS Business",
+    //         email: "demo.intervenant@skailup.com",
+    //         role: "Multi-rôle",
+    //         lastConnection: "30/10/2025",
+    //         programs: "7 programmes",
+    //         avatar: "/avatar1.jpg",
+    //     },
+    //     {
+    //         id: 2,
+    //         name: "Dipo BANDO",
+    //         contrib_name: "Za'Earth",
+    //         email: "test.i2@skailup.com",
+    //         role: "Coach",
+    //         lastConnection: "01/09/2025",
+    //         programs: "Prévisions+",
+    //         avatar: "/avatar2.jpg",
+    //     },
+    //     {
+    //         id: 3,
+    //         name: "Inter VENANT",
+    //         contrib_name: "Cont'Rib",
+    //         email: "test.i1@skailup.com",
+    //         role: "Coach",
+    //         lastConnection: "13/06/2025",
+    //         programs: "3 programmes",
+    //         avatar: "/avatar3.jpg",
+    //     },
+    // ];
 
     useEffect(() => {
         const fetchTags = async () => {
@@ -88,10 +91,35 @@ const StructureContributors = () => {
                 showToast.error("Impossible de charger les listes de rôles/statuts");
             }
         };
+        const fetchContributors = async () => {
+            try {
+                const res = await fetch(`${API_URL}/contributors`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data?.error || "Erreur lors du chargement des contributeurs");
+                }
+
+                setContributors(data ?? []);
+            } catch (e) {
+                console.error(e);
+                showToast.error("Impossible de charger la liste des contributeurs");
+            }
+        };
 
         fetchTags();
+        fetchContributors();
     }, []);
 
+    console.log(contributors);
+    
     const handleInviteContrib = async (e) => {
         e.preventDefault();
 
@@ -289,7 +317,7 @@ const StructureContributors = () => {
                         </thead>
 
                         <tbody>
-                            {sampleContributors.map((c) => (
+                            {contributors.map((c) => (
                                 <tr key={c.id}>
                                     <td className={style.colContributor}>
                                         <div className={style.avatarWrap}>
@@ -310,8 +338,8 @@ const StructureContributors = () => {
                                     <td>
                                         <span className={style.roleBadge}>{c.role}</span>
                                     </td>
-                                    <td>{c.lastConnection}</td>
-                                    <td className={style.programs}>{c.programs}</td>
+                                    <td>{c.lastConnection || '-'}</td>
+                                    <td className={style.programs}>{c.programs || '0 programme'}</td>
                                     <td className={style.actions}>
                                         <EyesIcon />
                                     </td>
