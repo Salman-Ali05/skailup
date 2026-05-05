@@ -1,0 +1,111 @@
+.wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.label span {
+    color: #d11;
+    margin-left: 2px;
+}
+
+.trigger {
+    width: 200px;
+    min-height: 48px;
+    padding: 0 14px;
+    border: 1px solid #d9e0ec;
+    border-radius: 8px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+}
+
+.trigger:hover {
+    border-color: #b9c5d8;
+}
+
+.selectedText {
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.placeholder {
+    color: #8a94a6;
+}
+
+.chevron {
+    margin-left: 8px;
+    color: #5f6b7a;
+}
+
+.dropdown {
+    position: absolute;
+    z-index: 50;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 100%;
+    max-height: 190px;
+    overflow-y: auto;
+    background: #fff;
+    border: 1px solid #d9e0ec;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+    padding: 6px;
+}
+
+.option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.option:hover {
+    background: #f3f6fb;
+}
+
+.option input {
+    cursor: pointer;
+}
+
+.empty {
+    padding: 10px;
+    color: #8a94a6;
+    font-size: 14px;
+}
+.rightSide {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
+.countBadge {
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #eef3ff;
+    color: #1f4ed8;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
