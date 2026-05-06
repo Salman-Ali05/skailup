@@ -6,6 +6,7 @@ import style from "./projects.module.css";
 import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
 import EyesIcon from "@/app/components/Icons/Eyes";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
+import Popup from "@/app/components/Popup/Popup";
 
 const sampleProjects = [
     {

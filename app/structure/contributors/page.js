@@ -206,7 +206,7 @@ const StructureContributors = () => {
 
     return (
         <div className={style["structure-layout"]}>
-            <Popup open={openPopup} onClose={() => setOpenPopup(false)}>
+            <Popup open={openPopup} title="Inviter un intervenant" onClose={() => setOpenPopup(false)}>
                 <form className={stylePopup.form} onSubmit={handleInviteContrib}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
