@@ -99,39 +99,6 @@ const StructureContributors = () => {
     const [contributors, setContributors] = useState([]);
 
 
-    // const sampleContributors = [
-    //     {
-    //         id: 1,
-    //         name: "Florino JEAN",
-    //         contrib_name: "SOS Business",
-    //         email: "demo.intervenant@skailup.com",
-    //         role: "Multi-rôle",
-    //         lastConnection: "30/10/2025",
-    //         programs: "7 programmes",
-    //         avatar: "/avatar1.jpg",
-    //     },
-    //     {
-    //         id: 2,
-    //         name: "Dipo BANDO",
-    //         contrib_name: "Za'Earth",
-    //         email: "test.i2@skailup.com",
-    //         role: "Coach",
-    //         lastConnection: "01/09/2025",
-    //         programs: "Prévisions+",
-    //         avatar: "/avatar2.jpg",
-    //     },
-    //     {
-    //         id: 3,
-    //         name: "Inter VENANT",
-    //         contrib_name: "Cont'Rib",
-    //         email: "test.i1@skailup.com",
-    //         role: "Coach",
-    //         lastConnection: "13/06/2025",
-    //         programs: "3 programmes",
-    //         avatar: "/avatar3.jpg",
-    //     },
-    // ];
-
     useEffect(() => {
         const fetchTags = async () => {
             try {
@@ -272,7 +239,7 @@ const StructureContributors = () => {
 
     return (
         <div className={style["structure-layout"]}>
-            <Popup open={openPopup} title="Inviter un intervenant" onClose={() => setOpenPopup(false)}>
+            <Popup open={openPopup} title="Nouvel intervenant" onClose={() => setOpenPopup(false)}>
                 <form className={stylePopup.form} onSubmit={handleInviteContrib}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
