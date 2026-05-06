@@ -45,6 +45,39 @@ import Multiselect from "@/app/components/Multiselect/Multiselect";
 //     if (!programs) return <p>Pas de programmes</p>
 // }, []);
 
+
+
+// const samplePrograms = [
+//     {
+//         id: 1,
+//         Param_Name: {programs.name},
+//         description: "Programme d'accompagnement",
+//         date_start: "2025-06-01",
+//         date_end: "2025-12-31",
+//         status: "En cours",
+//         Program: { name: "Coaching", icon: "/program1.png" },
+//         Contributors: [
+//             { firstName: "Julie", lastName: "Lafontaine" },
+//             { firstName: "Florino", lastName: "Jean" }
+//         ],
+//         Projects: ["Bio&Smart", "Capitole"],
+//     },
+// ];
+
+
+// useEffect(() => {
+
+//     fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//     })
+//         .then((res) => res.json())
+//         .then(programs => {
+//             setPrograms(programs);
+//             setLoading(false);
+//         })
+//     if (!programs) return <p>Pas de programmes</p>
+// }, []);
+
 const StructureContributors = () => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const { user, session } = useUser();

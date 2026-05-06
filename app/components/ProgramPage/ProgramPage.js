@@ -104,7 +104,7 @@ const ProgramPage = ({
         const [y, m, d] = iso.split("-");
         return `${d}/${m}/${y}`;
     };
-
+    
     const projectNameById = React.useMemo(() => {
         const map = new Map();
         projects.forEach((project) => {
@@ -136,15 +136,6 @@ const ProgramPage = ({
         return map;
     }, [tagParamStructures]);
 
-    const tagParamOptions = React.useMemo(() => {
-        return tagParamStructures
-            .filter((tag) => tag && tag.id)
-            .map((tag) => {
-                const label = tag.label || tag.name || tag.description || tag.tag || tag.value || "-";
-                return { id: tag.id, label };
-            });
-    }, [tagParamStructures]);
-
     const contributorNameById = React.useMemo(() => {
         const map = new Map();
         contributors.forEach((contributor) => {
@@ -165,6 +156,15 @@ const ProgramPage = ({
             return acc;
         }, {});
     }, [programContributors, contributorNameById]);
+
+    const tagParamOptions = React.useMemo(() => {
+        return tagParamStructures
+            .filter((tag) => tag && tag.id)
+            .map((tag) => {
+                const label = tag.label || tag.name || tag.description || tag.tag || tag.value || "-";
+                return { id: tag.id, label };
+            });
+    }, [tagParamStructures]);
 
     const statusOptionsList = React.useMemo(() => {
         return statusOptions
@@ -239,7 +239,7 @@ const ProgramPage = ({
                                     ) : null} <br></br>
                                     {program.description}
                                 </td>
-
+                                
                                 <td>{formatDate(program.date_start)}</td>
 
                                 <td>{formatDate(program.date_end)}</td>
