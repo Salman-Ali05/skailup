@@ -11,6 +11,7 @@ import Popup from "@/app/components/Popup/Popup";
 import { showToast } from "nextjs-toast-notify";
 import { useUser } from "@/app/utils/contexts/userContext";
 import Multiselect from "@/app/components/Multiselect/Multiselect";
+import { formatDate } from "@/app/utils/fct/dateFormatter";
 
 const StructureContributors = () => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -119,7 +120,7 @@ const StructureContributors = () => {
     }, []);
 
     console.log(contributors);
-    
+
     const handleInviteContrib = async (e) => {
         e.preventDefault();
 
@@ -187,6 +188,20 @@ const StructureContributors = () => {
             console.error(e);
             showToast.error(`Erreur : ${e.message}`);
         }
+    };
+
+    const getRoleLabel = (contributor) => {
+        const tag1 = contributor?.tags?.Tag1 ?? [];
+
+        if (tag1.length > 1) {
+            return "Multi-rôle";
+        }
+
+        if (tag1.length === 1) {
+            return tag1[0]?.lang_fr;
+        }
+
+        return "-";
     };
 
     return (
@@ -322,24 +337,32 @@ const StructureContributors = () => {
                                     <td className={style.colContributor}>
                                         <div className={style.avatarWrap}>
                                             <Image
-                                                src={c.avatar}
-                                                alt={c.name}
+                                                src={c.user_details?.photo_url || "/woman.png"}
+                                                alt={c.name || "Intervenant"}
                                                 width={40}
                                                 height={40}
                                                 className={style.avatar}
                                             />
                                             <div className={style.nameWrap}>
-                                                <div className={style.name}>{c.name}</div>
+                                                <div className={style.name}>
+                                                    {c.user_details?.first_name} {c.user_details?.last_name}
+                                                </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td>{c.contrib_name}</td>
+
+                                    <td>{c.name}</td>
+
                                     <td className={style.emailCell}>{c.email}</td>
+
                                     <td>
-                                        <span className={style.roleBadge}>{c.role}</span>
+                                        <span className={style.roleBadge}>{getRoleLabel(c)}</span>
                                     </td>
-                                    <td>{c.lastConnection || '-'}</td>
-                                    <td className={style.programs}>{c.programs || '0 programme'}</td>
+
+                                    <td>{formatDate(c.user_details?.last_connect)}</td>
+
+                                    <td className={style.programs}>{c.programs || "0 programme"}</td>
+
                                     <td className={style.actions}>
                                         <EyesIcon />
                                     </td>
