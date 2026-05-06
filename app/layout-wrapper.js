@@ -9,7 +9,10 @@ export default function LayoutWrapper({ children }) {
 
     if (!pathname) return null;
 
-    const isAuthPage = pathname === '/login' || pathname === '/register';
+    const isAuthPage =
+        pathname === '/login' ||
+        pathname === '/register' ||
+        pathname === '/register/personal_info';
 
     if (isAuthPage) {
         return <>{children}</>;

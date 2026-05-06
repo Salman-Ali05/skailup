@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, React } from "react";
 import Image from "next/image";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./str_contributors.module.css";
@@ -12,6 +12,72 @@ import { showToast } from "nextjs-toast-notify";
 import { useUser } from "@/app/utils/contexts/userContext";
 import Multiselect from "@/app/components/Multiselect/Multiselect";
 import { formatDate } from "@/app/utils/fct/dateFormatter";
+
+
+
+// const samplePrograms = [
+//     {
+//         id: 1,
+//         Param_Name: {programs.name},
+//         description: "Programme d'accompagnement",
+//         date_start: "2025-06-01",
+//         date_end: "2025-12-31",
+//         status: "En cours",
+//         Program: { name: "Coaching", icon: "/program1.png" },
+//         Contributors: [
+//             { firstName: "Julie", lastName: "Lafontaine" },
+//             { firstName: "Florino", lastName: "Jean" }
+//         ],
+//         Projects: ["Bio&Smart", "Capitole"],
+//     },
+// ];
+
+
+// useEffect(() => {
+
+//     fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//     })
+//         .then((res) => res.json())
+//         .then(programs => {
+//             setPrograms(programs);
+//             setLoading(false);
+//         })
+//     if (!programs) return <p>Pas de programmes</p>
+// }, []);
+
+
+
+// const samplePrograms = [
+//     {
+//         id: 1,
+//         Param_Name: {programs.name},
+//         description: "Programme d'accompagnement",
+//         date_start: "2025-06-01",
+//         date_end: "2025-12-31",
+//         status: "En cours",
+//         Program: { name: "Coaching", icon: "/program1.png" },
+//         Contributors: [
+//             { firstName: "Julie", lastName: "Lafontaine" },
+//             { firstName: "Florino", lastName: "Jean" }
+//         ],
+//         Projects: ["Bio&Smart", "Capitole"],
+//     },
+// ];
+
+
+// useEffect(() => {
+
+//     fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//     })
+//         .then((res) => res.json())
+//         .then(programs => {
+//             setPrograms(programs);
+//             setLoading(false);
+//         })
+//     if (!programs) return <p>Pas de programmes</p>
+// }, []);
 
 const StructureContributors = () => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
