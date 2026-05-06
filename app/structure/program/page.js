@@ -66,7 +66,7 @@ const StructurePrograms = () => {
     }, []);
 
     useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/os_status`)
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/os_tags/os_status`)
             .then((res) => res.json())
             .then((data) => setStatusOptions(Array.isArray(data) ? data : []))
             .catch((err) => console.error(err));
@@ -133,8 +133,6 @@ const StructurePrograms = () => {
             console.error(err);
         }
     };
-
-
 
     return (
         <div className={style["structure-layout"]}>

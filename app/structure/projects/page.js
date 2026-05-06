@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./projects.module.css";
 import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
@@ -8,14 +8,18 @@ import EyesIcon from "@/app/components/Icons/Eyes";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
 import Popup from "@/app/components/Popup/Popup";
 import stylePopup from "@/app/components/Popup/PopupContent.module.css";
+import CloseIcon from "@/app/components/Icons/Close";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const StructureProjects = () => {
-
     const [openPopup, setOpenPopup] = useState(false);
+    const [projectTags, setProjectTags] = useState([]);
 
     const [projectForm, setProjectForm] = useState({
         project_name: "",
         project_status: "",
+        project_tag: "",
         note: "",
     });
 
@@ -26,6 +30,31 @@ const StructureProjects = () => {
     });
 
     const [participants, setParticipants] = useState([]);
+
+    useEffect(() => {
+        const fetchProjectTags = async () => {
+            try {
+                const res = await fetch(`${API_URL}/os_tags/tag_projects`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data?.error || "Erreur lors du chargement des tags projets");
+                }
+
+                setProjectTags(data?.os_tag_project ?? data?.tags ?? data ?? []);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetchProjectTags();
+    }, []);
 
     const handleProjectChange = (e) => {
         const { name, value } = e.target;
@@ -38,7 +67,11 @@ const StructureProjects = () => {
     };
 
     const handleAddParticipant = () => {
-        if (!participantForm.email || !participantForm.last_name || !participantForm.first_name) {
+        if (
+            !participantForm.email ||
+            !participantForm.last_name ||
+            !participantForm.first_name
+        ) {
             return;
         }
 
@@ -51,6 +84,12 @@ const StructureProjects = () => {
         });
     };
 
+    const handleRemoveParticipant = (indexToRemove) => {
+        setParticipants((prev) =>
+            prev.filter((_, index) => index !== indexToRemove)
+        );
+    };
+
     const handleCreateProject = (e) => {
         e.preventDefault();
 
@@ -60,17 +99,22 @@ const StructureProjects = () => {
         };
 
         console.log("CREATE PROJECT PAYLOAD =", payload);
-
-        // API plus tard
     };
+
     const sampleProjects = [
         {
             id: 1,
             name: "SOS Business",
             company: "SOS Business",
             role: "Multi-rôle",
+            tag: "Incubation",
             members: [
-                { firstName: "Florino", lastName: "JEAN", email: "demo.intervenant@skailup.com", avatar: "/avatar1.jpg" }
+                {
+                    firstName: "Florino",
+                    lastName: "JEAN",
+                    email: "demo.intervenant@skailup.com",
+                    avatar: "/avatar1.jpg",
+                },
             ],
             activity: "7 programmes",
         },
@@ -79,23 +123,22 @@ const StructureProjects = () => {
             name: "Za'Earth",
             company: "Za'Earth",
             role: "Coach",
+            tag: "Accélération",
             members: [
-                { firstName: "Dipo", lastName: "BANDO", email: "test.i2@skailup.com", avatar: "/avatar2.jpg" },
-                { firstName: "Julie", lastName: "Lafontaine", email: "julie.laf@skailup.com", avatar: "/avatar4.jpg" }
+                {
+                    firstName: "Dipo",
+                    lastName: "BANDO",
+                    email: "test.i2@skailup.com",
+                    avatar: "/avatar2.jpg",
+                },
+                {
+                    firstName: "Julie",
+                    lastName: "Lafontaine",
+                    email: "julie.laf@skailup.com",
+                    avatar: "/avatar4.jpg",
+                },
             ],
             activity: "Prévisions+",
-        },
-        {
-            id: 3,
-            name: "Cont'Rib",
-            company: "Cont'Rib",
-            role: "Coach",
-            members: [
-                { firstName: "Inter", lastName: "VENANT", email: "test.i1@skailup.com", avatar: "/avatar3.jpg" },
-                { firstName: "Florino", lastName: "JEAN", email: "demo.intervenant@skailup.com", avatar: "/avatar1.jpg" },
-                { firstName: "Julie", lastName: "Lafontaine", email: "julie.laf@skailup.com", avatar: "/avatar4.jpg" }
-            ],
-            activity: "3 programmes",
         },
     ];
 
@@ -120,29 +163,31 @@ const StructureProjects = () => {
                                 required
                             />
                         </div>
-
                         <div className={stylePopup.field}>
                             <label>
-                                Statut du projet<span>*</span>
+                                Tag du projet<span>*</span>
                             </label>
                             <select
                                 className="inputs"
-                                name="project_status"
-                                value={projectForm.project_status}
+                                name="project_tag"
+                                value={projectForm.project_tag}
                                 onChange={handleProjectChange}
                                 required
                             >
-                                <option value="">Sélectionner un statut</option>
-                                <option value="new">Nouveau</option>
-                                <option value="active">Actif</option>
-                                <option value="archived">Archivé</option>
+                                <option value="">Sélectionner un tag</option>
+                                {projectTags.map((tag) => (
+                                    <option key={tag.id} value={tag.id}>
+                                        {tag.lang_fr}
+                                    </option>
+                                ))}
                             </select>
                         </div>
                     </div>
 
                     <div>
                         <p style={{ marginBottom: "12px", fontWeight: 500 }}>
-                            Invitez les participants du projet<span style={{ color: "#d11" }}>*</span>
+                            Invitez les participants du projet
+                            <span style={{ color: "#d11" }}>*</span>
                         </p>
 
                         <div className={stylePopup.row}>
@@ -184,7 +229,9 @@ const StructureProjects = () => {
                             </div>
 
                             <div className={stylePopup.field}>
-                                <label style={{ visibility: "hidden" }}>Ajouter</label>
+                                <label style={{ visibility: "hidden" }}>
+                                    Ajouter
+                                </label>
                                 <button
                                     type="button"
                                     className="buttons-primary"
@@ -200,10 +247,26 @@ const StructureProjects = () => {
                         </p>
 
                         {participants.length > 0 && (
-                            <div style={{ marginTop: "12px" }}>
+                            <div className={stylePopup.participantList}>
                                 {participants.map((participant, index) => (
-                                    <div key={`${participant.email}-${index}`}>
-                                        {participant.first_name} {participant.last_name} — {participant.email}
+                                    <div
+                                        key={`${participant.email}-${index}`}
+                                        className={
+                                            index === 0
+                                                ? `${stylePopup.participantItem} ${stylePopup.participantItemFirst}`
+                                                : stylePopup.participantItem
+                                        }
+                                    >
+                                        <span>
+                                            {participant.first_name} {participant.last_name} — {participant.email}
+                                        </span>
+
+                                        <div
+                                            onClick={() => handleRemoveParticipant(index)}
+                                            className={stylePopup.removeParticipant}
+                                        >
+                                            <CloseIcon />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -228,6 +291,7 @@ const StructureProjects = () => {
                     </button>
                 </form>
             </Popup>
+
             <div className={style["structure-main"]}>
                 <div className={style["structure-content"]}>
                     <h2>Projets</h2>
@@ -250,7 +314,9 @@ const StructureProjects = () => {
                             <div className={style.tools}>
                                 <FilterProjects />
                                 <button
-                                    onClick={() => setOpenPopup(true)} className="buttons-primary-reversed">
+                                    onClick={() => setOpenPopup(true)}
+                                    className="buttons-primary-reversed"
+                                >
                                     <FiPlusCircle className="buttons-icon" /> Nouveau projet
                                 </button>
                             </div>
@@ -262,7 +328,8 @@ const StructureProjects = () => {
                             <tr>
                                 <th className="th-first th-100">Rôle</th>
                                 <th className="th-150">Projet</th>
-                                <th className=" th-150">Participant(s)</th>
+                                <th className="th-150">Tag</th>
+                                <th className="th-150">Participant(s)</th>
                                 <th className="th-150">Email(s)</th>
                                 <th className="th-150">Programmes</th>
                                 <th className="th-last th-100">Actions</th>
@@ -279,6 +346,8 @@ const StructureProjects = () => {
                                     </td>
 
                                     <td>{project.company}</td>
+
+                                    <td>{project.tag}</td>
 
                                     <td className={style.colProject}>
                                         <ListUsersInSession users={project.members} />
@@ -299,7 +368,6 @@ const StructureProjects = () => {
                             ))}
                         </tbody>
                     </table>
-
                 </div>
             </div>
         </div>
