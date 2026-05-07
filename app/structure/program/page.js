@@ -7,70 +7,12 @@ import ProgramPage from "@/app/components/ProgramPage/ProgramPage";
 
 const StructurePrograms = () => {
     const router = useRouter();
+    const openStatusId = "d20cd09d-ba64-4f84-a78c-ca3b71422d9d";
+    const closedStatusId = "ede65ade-1953-43c1-807b-0be999951dd0";
 
     const handleViewProgram = (programId) => {
         router.push(`/structure/activity/${programId}`);
     };
-
-    const [programs, setPrograms] = useState([]);
-    const [programProjects, setProgramProjects] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [programContributors, setProgramContributors] = useState([]);
-    const [contributors, setContributors] = useState([]);
-    const [tagParamStructures, setTagParamStructures] = useState([]);
-    const [statusOptions, setStatusOptions] = useState([]);
-
-    // Fetch programs
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`)
-            .then((res) => res.json())
-            .then((data) => setPrograms(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
-
-    // Fetch program-project relationships for mapping in the UI
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/program_projects`)
-            .then((res) => res.json())
-            .then((data) => setProgramProjects(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
-
-    // Fetch projects for mapping program-project relationships
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`)
-            .then((res) => res.json())
-            .then((data) => setProjects(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/program_contributors`)
-            .then((res) => res.json())
-            .then((data) => setProgramContributors(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/contributors`)
-            .then((res) => res.json())
-            .then((data) => setContributors(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/tag_param_structure`)
-            .then((res) => res.json())
-            .then((data) => setTagParamStructures(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
-
-    useEffect(() => {
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/os_status`)
-            .then((res) => res.json())
-            .then((data) => setStatusOptions(Array.isArray(data) ? data : []))
-            .catch((err) => console.error(err));
-    }, []);
 
     {/* Handlers for creating and editing programs, using the same form values structure for simplicity */ }
 
@@ -134,7 +76,78 @@ const StructurePrograms = () => {
         }
     };
 
+    const [programs, setPrograms] = useState([]);
+    const [programProjects, setProgramProjects] = useState([]);
+    const [projects, setProjects] = useState([]);
+    const [programContributors, setProgramContributors] = useState([]);
+    const [contributors, setContributors] = useState([]);
+    const [tagParamStructures, setTagParamStructures] = useState([]);
+    const [statusOptions, setStatusOptions] = useState([]);
+    const [programsCountByStatusOpened, setProgramsCountByStatusOpened] = useState(0);
+    const [programsCountByStatusClosed, setProgramsCountByStatusClosed] = useState(0);
 
+    // Fetch all necessary data on component mount
+    useEffect(() => {
+        const controller = new AbortController();
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`, {
+            signal: controller.signal,
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                setPrograms(data.programs);
+                setProgramProjects(data.programProjects);
+                setProgramContributors(data.programContributors);
+                setStatusOptions(data.statusOptions);
+                setTagParamStructures(data.tagParamStructures);
+                setContributors(data.contributors);
+            })
+            .catch((err) => {
+                if (err?.name !== "AbortError") {
+                    console.error(err);
+                }
+            });
+
+
+
+        fetch(
+
+            `${process.env.NEXT_PUBLIC_API_URL}/programs/count/by-status?statusIds=${encodeURIComponent(openStatusId)}`,
+            {
+                signal: controller.signal,
+            }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                setProgramsCountByStatusOpened(data.count ?? 0);
+            })
+            .catch((err) => {
+                if (err?.name !== "AbortError") {
+                    console.error(err);
+                }
+            });
+
+        fetch(
+
+            `${process.env.NEXT_PUBLIC_API_URL}/programs/count/by-status?statusIds=${encodeURIComponent(closedStatusId)}`,
+            {
+                signal: controller.signal,
+            }
+        )
+            .then((res) => res.json())
+            .then((data) => {
+                setProgramsCountByStatusClosed(data.count ?? 0);
+            })
+            .catch((err) => {
+                if (err?.name !== "AbortError") {
+                    console.error(err);
+                }
+            });
+
+        return () => controller.abort();
+
+
+    }, []);
 
     return (
         <div className={style["structure-layout"]}>
@@ -147,6 +160,8 @@ const StructurePrograms = () => {
                     contributors={contributors}
                     tagParamStructures={tagParamStructures}
                     statusOptions={statusOptions}
+                    programsCountByStatusOpened={programsCountByStatusOpened}
+                    programsCountByStatusClosed={programsCountByStatusClosed}
                     onViewProgram={handleViewProgram}
                     onCreateProgram={handleCreateProgram}
                     onEditProgram={handleEditProgram}

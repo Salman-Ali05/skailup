@@ -17,6 +17,8 @@ const ProgramPage = ({
     contributors = [],
     tagParamStructures = [],
     statusOptions = [],
+    programsCountByStatusOpened = 0,
+    programsCountByStatusClosed = 0,
     onViewProgram,
     onEditProgram = () => { },
     onCreateProgram = () => { },
@@ -100,16 +102,32 @@ const ProgramPage = ({
         }));
     };
     const formatDate = (iso) => {
-        if (!iso) return "-";
+        if (!iso) return "";
         const [y, m, d] = iso.split("-");
         return `${d}/${m}/${y}`;
+    };
+
+    const getContributorDisplayName = (contributor) => {
+        if (!contributor) return "";
+        const first = contributor.user_details?.first_name;
+        const last = contributor.user_details?.last_name;
+        const fullName = [first, last].filter(Boolean).join(" ");
+        return (
+            contributor.name ||
+            contributor.contrib_name ||
+            contributor.contributor_details?.contrib_name ||
+            contributor.contributor_details?.name ||
+            fullName ||
+            contributor.user?.email ||
+            ""
+        );
     };
     
     const projectNameById = React.useMemo(() => {
         const map = new Map();
         projects.forEach((project) => {
             if (project && project.id) {
-                map.set(project.id, project.name || "-");
+                map.set(project.id, project.name);
             }
         });
         return map;
@@ -131,7 +149,7 @@ const ProgramPage = ({
         tagParamStructures.forEach((tag) => {
             if (!tag || !tag.id) return;
             const value = tag.label || tag.name || tag.description || tag.tag || tag.value;
-            map.set(tag.id, value || "-");
+            map.set(tag.id, value || "");
         });
         return map;
     }, [tagParamStructures]);
@@ -140,7 +158,7 @@ const ProgramPage = ({
         const map = new Map();
         contributors.forEach((contributor) => {
             if (contributor && contributor.id) {
-                map.set(contributor.id, contributor.name || "-");
+                map.set(contributor.id, getContributorDisplayName(contributor));
             }
         });
         return map;
@@ -178,7 +196,7 @@ const ProgramPage = ({
     const statusLabelById = React.useMemo(() => {
         const map = new Map();
         statusOptionsList.forEach((status) => {
-            map.set(status.id, status.label || "-");
+            map.set(status.id, status.label || "");
         });
         return map;
     }, [statusOptionsList]);
@@ -192,12 +210,12 @@ const ProgramPage = ({
                     <div className="tabs">
                         <div className="tab tabActive">
                             <p>
-                                Ouvert <span>(7)</span>
+                                Ouvert <span>({programsCountByStatusOpened})</span>
                             </p>
                         </div>
                         <div className="tab">
                             <p>
-                                En cours <span>(1)</span>
+                                En cours <span>({programsCountByStatusClosed})</span>
                             </p>
                         </div>
                     </div>
@@ -245,16 +263,16 @@ const ProgramPage = ({
                                 <td>{formatDate(program.date_end)}</td>
 
                                 <td>
-                                    {(programContributorNames[program.id] || ["-"]).join(", ")}
+                                    {(programContributorNames[program.id] || []).join(", ")}
                                 </td>
 
                                 <td>
-                                    {(programProjectNames[program.id] || ["-"]).join(", ")}
+                                    {(programProjectNames[program.id] || []).join(", ")}
                                 </td>
 
                                 <td>
                                     <span className={style.roleBadge}>
-                                        {statusLabelById.get(program.id_status) || program.id_status || "-"}
+                                        {statusLabelById.get(program.id_status) || program.id_status || ""}
                                     </span>
                                 </td>
 
