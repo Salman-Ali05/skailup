@@ -1,49 +1,53 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./projects.module.css";
 import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
 import EyesIcon from "@/app/components/Icons/Eyes";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
+import GoToIcon from "@/app/components/Icons/GoTo";
 
-const sampleProjects = [
-    {
-        id: 1,
-        name: "SOS Business",
-        company: "SOS Business",
-        role: "Multi-rôle",
-        members: [
-            { firstName: "Florino", lastName: "JEAN", email: "demo.intervenant@skailup.com", avatar: "/avatar1.jpg" }
-        ],
-        activity: "7 programmes",
-    },
-    {
-        id: 2,
-        name: "Za'Earth",
-        company: "Za'Earth",
-        role: "Coach",
-        members: [
-            { firstName: "Dipo", lastName: "BANDO", email: "test.i2@skailup.com", avatar: "/avatar2.jpg" },
-            { firstName: "Julie", lastName: "Lafontaine", email: "julie.laf@skailup.com", avatar: "/avatar4.jpg" }
-        ],
-        activity: "Prévisions+",
-    },
-    {
-        id: 3,
-        name: "Cont'Rib",
-        company: "Cont'Rib",
-        role: "Coach",
-        members: [
-            { firstName: "Inter", lastName: "VENANT", email: "test.i1@skailup.com", avatar: "/avatar3.jpg" },
-            { firstName: "Florino", lastName: "JEAN", email: "demo.intervenant@skailup.com", avatar: "/avatar1.jpg" },
-            { firstName: "Julie", lastName: "Lafontaine", email: "julie.laf@skailup.com", avatar: "/avatar4.jpg" }
-        ],
-        activity: "3 programmes",
-    },
-];
+const ProjectsPage = () => {
 
-const StructureProjects = () => {
+    const [projects, setProjects] = useState([]);
+    const [projectDetails, setProjectDetails] = useState([]);
+    const [tagProjects, setTagProjects] = useState([]);
+
+    // Fetch all necessary data on component mount
+    useEffect(() => {
+        const controller = new AbortController();
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
+            signal: controller.signal,
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const list = Array.isArray(data) ? data : data?.projects || [];
+                const detailsFromProjects = list
+                    .map((project) => project?.project_detail)
+                    .filter(Boolean);
+                setProjects(list);
+                setProjectDetails(data?.projectDetails || detailsFromProjects);
+                setTagProjects(data?.tagProjects || []);
+            })
+            .catch((err) => {
+                if (err?.name !== "AbortError") {
+                    console.error(err);
+                }
+            });
+    }, []);
+
+    const projectDetailById = React.useMemo(() => {
+        const map = new Map();
+        projectDetails.forEach((detail) => {
+            if (detail && detail.id) {
+                map.set(detail.id, detail);
+            }
+        });
+        return map;
+    }, [projectDetails]);
+
     return (
         <div className={style["structure-layout"]}>
             <div className={style["structure-main"]}>
@@ -87,7 +91,7 @@ const StructureProjects = () => {
                         </thead>
 
                         <tbody>
-                            {sampleProjects.map((project) => (
+                            {projects.map((project) => (
                                 <tr key={project.id}>
                                     <td>
                                         <span className={style.roleBadge}>
@@ -95,22 +99,61 @@ const StructureProjects = () => {
                                         </span>
                                     </td>
 
-                                    <td>{project.company}</td>
+                                    <td>{project.name}</td>
 
                                     <td className={style.colProject}>
-                                        <ListUsersInSession users={project.members} />
+                                        <ListUsersInSession users={project.members || []} />
                                     </td>
 
                                     <td className={style.emailCell}>
-                                        {project.members.map((member) => member.email).join(", ")}
+                                        {(() => {
+                                            { project.email }
+                                            return project.email
+                                        })()}
                                     </td>
 
-                                    <td className={style.activity}>
-                                        {project.activity}
+                                    <td>
+                                        {(project.project_programs || [])
+                                            .map((link) => link.program?.description || link.program?.description)
+                                            .filter(Boolean)
+                                            .join(", ") || "-"}
                                     </td>
 
-                                    <td className={style.actions}>
-                                        <EyesIcon />
+                                    <td>
+                                        <div className={style.actions}>
+                                            <div>
+                                                <EyesIcon />
+                                            </div>
+                                            <div
+                                                className="cursorOn"
+                                                role="button"
+                                                aria-label="Modifier le programme"
+                                                onClick={() => openEdit(program)}
+                                            >
+                                                <svg
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                >
+                                                    <path
+                                                        d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25Z"
+                                                        fill="currentColor"
+                                                    />
+                                                    <path
+                                                        d="M20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
+                                                        fill="currentColor"
+                                                    />
+                                                </svg>
+                                            </div>
+                                            <div
+                                                className="cursorOn"
+                                                onClick={() => onViewProgram(program.id)}
+                                            >
+                                                <GoToIcon />
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -123,4 +166,4 @@ const StructureProjects = () => {
     );
 };
 
-export default StructureProjects;
+export default ProjectsPage;

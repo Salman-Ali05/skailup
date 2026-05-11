@@ -97,6 +97,7 @@ const StructurePrograms = () => {
             .then((data) => {
                 setPrograms(data.programs);
                 setProgramProjects(data.programProjects);
+                setProjects(data.projects);
                 setProgramContributors(data.programContributors);
                 setStatusOptions(data.statusOptions);
                 setTagParamStructures(data.tagParamStructures);
