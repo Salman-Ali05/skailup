@@ -61,12 +61,6 @@ const SideMenu = () => {
             href: `/${typeProfil}/settings`,
             profiles: ["structure"],
         },
-        {
-            label: "Debug",
-            icon: <FaCheck />,
-            href: `../../register/personal_info`,
-            profiles: ["structure", "project", "contributor"],
-        },
     ];
 
     const pathname = usePathname();
