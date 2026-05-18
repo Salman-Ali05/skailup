@@ -12,72 +12,6 @@ import { showToast } from "nextjs-toast-notify";
 import { useUser } from "@/app/utils/contexts/userContext";
 import Multiselect from "@/app/components/Multiselect/Multiselect";
 
-
-
-// const samplePrograms = [
-//     {
-//         id: 1,
-//         Param_Name: {programs.name},
-//         description: "Programme d'accompagnement",
-//         date_start: "2025-06-01",
-//         date_end: "2025-12-31",
-//         status: "En cours",
-//         Program: { name: "Coaching", icon: "/program1.png" },
-//         Contributors: [
-//             { firstName: "Julie", lastName: "Lafontaine" },
-//             { firstName: "Florino", lastName: "Jean" }
-//         ],
-//         Projects: ["Bio&Smart", "Capitole"],
-//     },
-// ];
-
-
-// useEffect(() => {
-
-//     fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//     })
-//         .then((res) => res.json())
-//         .then(programs => {
-//             setPrograms(programs);
-//             setLoading(false);
-//         })
-//     if (!programs) return <p>Pas de programmes</p>
-// }, []);
-
-
-
-// const samplePrograms = [
-//     {
-//         id: 1,
-//         Param_Name: {programs.name},
-//         description: "Programme d'accompagnement",
-//         date_start: "2025-06-01",
-//         date_end: "2025-12-31",
-//         status: "En cours",
-//         Program: { name: "Coaching", icon: "/program1.png" },
-//         Contributors: [
-//             { firstName: "Julie", lastName: "Lafontaine" },
-//             { firstName: "Florino", lastName: "Jean" }
-//         ],
-//         Projects: ["Bio&Smart", "Capitole"],
-//     },
-// ];
-
-
-// useEffect(() => {
-
-//     fetch(`${process.env.NEXT_PUBLIC_API_URL}/programs`, {
-//         headers: { Authorization: `Bearer ${token}` },
-//     })
-//         .then((res) => res.json())
-//         .then(programs => {
-//             setPrograms(programs);
-//             setLoading(false);
-//         })
-//     if (!programs) return <p>Pas de programmes</p>
-// }, []);
-
 const StructureContributors = () => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const { user, session } = useUser();
@@ -95,40 +29,31 @@ const StructureContributors = () => {
         Tag3: [],
     });
 
-    const sampleContributors = [
-        {
-            id: 1,
-            name: "Florino JEAN",
-            contrib_name: "SOS Business",
-            email: "demo.intervenant@skailup.com",
-            role: "Multi-rôle",
-            lastConnection: "30/10/2025",
-            programs: "7 programmes",
-            avatar: "/avatar1.jpg",
-        },
-        {
-            id: 2,
-            name: "Dipo BANDO",
-            contrib_name: "Za'Earth",
-            email: "test.i2@skailup.com",
-            role: "Coach",
-            lastConnection: "01/09/2025",
-            programs: "Prévisions+",
-            avatar: "/avatar2.jpg",
-        },
-        {
-            id: 3,
-            name: "Inter VENANT",
-            contrib_name: "Cont'Rib",
-            email: "test.i1@skailup.com",
-            role: "Coach",
-            lastConnection: "13/06/2025",
-            programs: "3 programmes",
-            avatar: "/avatar3.jpg",
-        },
-    ];
+    const [contributors, setContributors] = useState([]);
 
     useEffect(() => {
+        if (!token) return;
+
+        const controller = new AbortController();
+
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/contributors`, {
+            signal: controller.signal,
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+            },
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                const list = Array.isArray(data) ? data : data?.contributors || [];
+                setContributors(list);
+            })
+            .catch((err) => {
+                if (err?.name !== "AbortError") {
+                    console.error(err);
+                }
+            });
+
         const fetchTags = async () => {
             try {
                 const res = await fetch(`${API_URL}/os_tags/tag_contributors`, {
@@ -156,7 +81,9 @@ const StructureContributors = () => {
         };
 
         fetchTags();
-    }, []);
+
+        return () => controller.abort();
+    }, [token]);
 
     const handleInviteContrib = async (e) => {
         e.preventDefault();
@@ -229,6 +156,68 @@ const StructureContributors = () => {
 
     return (
         <div className={style["structure-layout"]}>
+            <div className={style["structure-main"]}>
+                <div className={style["structure-content"]}>
+                    <h2>Intervenants</h2>
+
+                    <div className={style.headerRow}>
+                        <div className="headerActions">
+                            <div className="tabs">
+                                <div className="tab tabActive">
+                                    <p>
+                                        Inscrit <span>(7)</span>
+                                    </p>
+                                </div>
+                                <div className="tab">
+                                    <p>
+                                        Invitation <span>(1)</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className={style.tools}>
+                                <FilterContributors />
+                                <button
+                                    className="buttons-primary-reversed"
+                                    onClick={() => setOpenPopup(true)}
+                                >
+                                    <FiPlusCircle className="buttons-icon" /> Nouvel intervenant
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table className={style["contributors-table"]}>
+                        <thead>
+                            <tr>
+                                <th className="th-first th-150">Intervenant</th>
+                                <th className="th-150">Société</th>
+                                <th className="th-150">Email</th>
+                                <th className="th-100">Rôle</th>
+                                <th className="th-100">Dernière connexion</th>
+                                <th className="th-150">Programmes</th>
+                                <th className="th-last th-100">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {contributors.map((contributor) => (
+                                <tr key={contributor.id}>
+                                    <td>
+                                        <span className={style.roleBadge}>
+                                            {contributor.role}
+                                        </span>
+                                    </td>
+
+                                    <td>{contributor.contributor_details?.name || ""}</td>
+
+                                    <td>{contributor.contributor_details?.email || ""}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <Popup open={openPopup} onClose={() => setOpenPopup(false)}>
                 <form className={stylePopup.form} onSubmit={handleInviteContrib}>
                     <div className={stylePopup.row}>
@@ -309,84 +298,6 @@ const StructureContributors = () => {
                     </button>
                 </form>
             </Popup>
-
-            <div className={style["structure-main"]}>
-                <div className={style["structure-content"]}>
-                    <h2>Intervenants</h2>
-
-                    <div className={style.headerRow}>
-                        <div className="headerActions">
-                            <div className="tabs">
-                                <div className="tab tabActive">
-                                    <p>
-                                        Inscrit <span>(7)</span>
-                                    </p>
-                                </div>
-                                <div className="tab">
-                                    <p>
-                                        Invitation <span>(1)</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className={style.tools}>
-                                <FilterContributors />
-                                <button
-                                    className="buttons-primary-reversed"
-                                    onClick={() => setOpenPopup(true)}
-                                >
-                                    <FiPlusCircle className="buttons-icon" /> Nouvel intervenant
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <table className={style["contributors-table"]}>
-                        <thead>
-                            <tr>
-                                <th className="th-first th-150">Intervenant</th>
-                                <th className="th-150">Société</th>
-                                <th className="th-150">Email</th>
-                                <th className="th-100">Rôle</th>
-                                <th className="th-100">Dernière connexion</th>
-                                <th className="th-150">Programmes</th>
-                                <th className="th-last th-100">Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {sampleContributors.map((c) => (
-                                <tr key={c.id}>
-                                    <td className={style.colContributor}>
-                                        <div className={style.avatarWrap}>
-                                            <Image
-                                                src={c.avatar}
-                                                alt={c.name}
-                                                width={40}
-                                                height={40}
-                                                className={style.avatar}
-                                            />
-                                            <div className={style.nameWrap}>
-                                                <div className={style.name}>{c.name}</div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td>{c.contrib_name}</td>
-                                    <td className={style.emailCell}>{c.email}</td>
-                                    <td>
-                                        <span className={style.roleBadge}>{c.role}</span>
-                                    </td>
-                                    <td>{c.lastConnection}</td>
-                                    <td className={style.programs}>{c.programs}</td>
-                                    <td className={style.actions}>
-                                        <EyesIcon />
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     );
 };

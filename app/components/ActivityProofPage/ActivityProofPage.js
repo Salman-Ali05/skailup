@@ -2,12 +2,20 @@
 
 import React from "react";
 import style from "./ActivityProofPage.module.css";
+import Multiselect from "@/app/components/Multiselect/Multiselect";
 
 const ActivityProofPage = ({
     activitiesProof = [],
     onViewActivityProof,
     onCreateActivityProof,
 }) => {
+    const [selectedStatus, setSelectedStatus] = React.useState([]);
+    const staticStatusOptions = [
+        { id: "status-1", lang_fr: "En cours" },
+        { id: "status-2", lang_fr: "Termine" },
+        { id: "status-3", lang_fr: "Planifie" }
+    ];
+
     const formatDate = (iso) => {
         if (!iso) return "-";
         const [y, m, d] = iso.split("-");
@@ -32,25 +40,14 @@ const ActivityProofPage = ({
                                                 <option value="2">ee</option>
                                             </select>
                                         </div>
-                                        <div className={style.fieldGroup}>
+                                        <div className={`${style.inputs} ${style.dropDown}`}>
                                             <label>Veuillez saisir le participant concerné :</label>
-                                            <select className={`${style.inputs} ${style.multipleSelect}`} multiple required>
-                                                <option value="" disabled style={{ color: "#aaa" }}>Participant</option>
-                                                <option>Julie Flor - Bio&Smart</option>
-                                                <option>Jetto Puro - Test'eur</option>
-                                                <option>Toki Gin - Sakana</option>
-                                            </select>
-                                        </div>
-
-                                        <div className={stylePopup.field}>
                                             <Multiselect
-                                                label="Situation"
+                                                label="Statut"
                                                 required
-                                                options={osTagsContributor.os_tag3}
-                                                value={selectedTags.Tag3}
-                                                onChange={(value) =>
-                                                    setSelectedTags((prev) => ({ ...prev, Tag3: value }))
-                                                }
+                                                options={staticStatusOptions}
+                                                value={selectedStatus}
+                                                onChange={setSelectedStatus}
                                                 placeholder="Veuillez saisir le participant concerné :"
                                             />
                                         </div>
