@@ -3,16 +3,56 @@
 import React, { useEffect, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./projects.module.css";
+import stylePopup from "@/app/components/Popup/PopupContent.module.css";
 import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
 import EyesIcon from "@/app/components/Icons/Eyes";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
 import GoToIcon from "@/app/components/Icons/GoTo";
+import Popup from "@/app/components/Popup/Popup";
 
 const ProjectsPage = () => {
 
     const [projects, setProjects] = useState([]);
     const [projectDetails, setProjectDetails] = useState([]);
     const [tagProjects, setTagProjects] = useState([]);
+    const [openPopupCreate, setOpenPopupCreate] = useState(false);
+    const [openPopupEdit, setOpenPopupEdit] = useState(false);
+    const [formValues, setFormValues] = React.useState({
+        id: "",
+        id_param_structure: "",
+        description: "",
+        date_start: "",
+        date_end: "",
+        id_status: "",
+    });
+
+    const openCreate = () => setOpenPopupCreate(true);
+    const closeCreate = () => setOpenPopupCreate(false);
+    const closeEdit = () => setOpenPopupEdit(false);
+
+    const handleCreateConfirm = (event) => {
+        event.preventDefault();
+        closeCreate();
+    };
+
+    const openEdit = (project) => {
+        setFormValues({
+            id: project?.id || "",
+            id_param_structure: project?.id_param_structure || "",
+            description: project?.description || "",
+            date_start: project?.date_start || "",
+            date_end: project?.date_end || "",
+            id_status: project?.id_status || "",
+        });
+        setOpenPopupEdit(true);
+    };
+
+    const handleFormChange = (key) => (event) => {
+        setFormValues((prev) => ({
+            ...prev,
+            [key]: event.target.value,
+        }));
+    };
 
     // Fetch all necessary data on component mount
     useEffect(() => {
@@ -71,7 +111,10 @@ const ProjectsPage = () => {
 
                             <div className={style.tools}>
                                 <FilterProjects />
-                                <button className="buttons-primary-reversed">
+                                <button
+                                    className="buttons-primary-reversed"
+                                    onClick={openCreate}
+                                >
                                     <FiPlusCircle className="buttons-icon" /> Nouveau projet
                                 </button>
                             </div>
@@ -102,7 +145,13 @@ const ProjectsPage = () => {
                                     <td>{project.name}</td>
 
                                     <td className={style.colProject}>
-                                        <ListUsersInSession users={project.members || []} />
+                                        {(project.project_users || [])
+                                            .map((link) => (
+                                                `${link.user_details?.first_name || ""} ${link.user_details?.last_name || ""}`
+                                                    .trim()
+                                            ))
+                                            .filter(Boolean)
+                                            .join(", ") || "-"}
                                     </td>
 
                                     <td className={style.emailCell}>
@@ -127,8 +176,8 @@ const ProjectsPage = () => {
                                             <div
                                                 className="cursorOn"
                                                 role="button"
-                                                aria-label="Modifier le programme"
-                                                onClick={() => openEdit(program)}
+                                                aria-label="Modifier le projet"
+                                                onClick={() => openEdit(project)}
                                             >
                                                 <svg
                                                     width="16"
@@ -160,6 +209,169 @@ const ProjectsPage = () => {
                         </tbody>
                     </table>
 
+                    {/* Popup de création de projet */}
+                    <Popup open={openPopupCreate} onClose={closeCreate} title="Créer un projet et inviter ses participants">
+                        <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Nom du projet / de l’entreprise<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("description")}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Mail<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("email")}
+                                    />
+                                </div>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Nom<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("nom")}
+                                    />
+                                </div>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Prénom<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("prenom")}
+                                    />
+                                </div>
+                                <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                                    Ajouter
+                                </button>
+                            </div>
+
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Note interne
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        placeholder="Note interne"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("note")}
+                                    />
+                                </div>
+                            </div>
+
+                            <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                                Continuer
+                            </button>
+                        </form>
+                    </Popup>
+
+                    {/* Popup de modification de projet */}
+                    <Popup open={openPopupEdit} onClose={closeEdit} title="Modifier le projet">
+                        <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Nom du projet / de l’entreprise<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("description")}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Mail<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("email")}
+                                    />
+                                </div>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Nom<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("nom")}
+                                    />
+                                </div>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Prénom<span>*</span>
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("prenom")}
+                                    />
+                                </div>
+                                <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                                    Ajouter
+                                </button>
+                            </div>
+
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label>
+                                        Note interne
+                                    </label>
+                                    <input
+                                        className="inputs"
+                                        type="text"
+                                        placeholder="Note interne"
+                                        required
+                                        value={formValues.name}
+                                        onChange={handleFormChange("note")}
+                                    />
+                                </div>
+                            </div>
+
+                            <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                                Continuer
+                            </button>
+                        </form>
+                    </Popup>
                 </div>
             </div>
         </div>

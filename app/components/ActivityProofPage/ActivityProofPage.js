@@ -41,6 +41,19 @@ const ActivityProofPage = ({
                                                 <option>Toki Gin - Sakana</option>
                                             </select>
                                         </div>
+
+                                        <div className={stylePopup.field}>
+                                            <Multiselect
+                                                label="Situation"
+                                                required
+                                                options={osTagsContributor.os_tag3}
+                                                value={selectedTags.Tag3}
+                                                onChange={(value) =>
+                                                    setSelectedTags((prev) => ({ ...prev, Tag3: value }))
+                                                }
+                                                placeholder="Veuillez saisir le participant concerné :"
+                                            />
+                                        </div>
                                     </div>
 
                                     <div className={`panel ${style.panelGroup}`}>
@@ -55,10 +68,10 @@ const ActivityProofPage = ({
                                             <label>Veuillez saisir la période d’analyse : Début et Fin</label>
                                             <div className={style.dateRow}>
                                                 <div className={style.dateGroup}>
-                                                    <input className={`${style.inputs} ${style.dateInput}`} type="date" required/>
+                                                    <input className={`${style.inputs} ${style.dateInput}`} type="date" required />
                                                 </div>
                                                 <div className={style.dateGroup}>
-                                                    <input className={`${style.inputs} ${style.dateInput}`} type="date" required/>
+                                                    <input className={`${style.inputs} ${style.dateInput}`} type="date" required />
                                                 </div>
                                             </div>
                                         </div>
@@ -73,7 +86,7 @@ const ActivityProofPage = ({
                         </div>
                     </div>
                 </div>
-            </div>  
+            </div>
         </div>
     );
 };
