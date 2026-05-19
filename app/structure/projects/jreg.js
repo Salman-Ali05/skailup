@@ -3,17 +3,17 @@
 import React, { useEffect, useState } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./projects.module.css";
-import stylePopup from "@/app/components/Popup/PopupContent.module.css";
 import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
 import EyesIcon from "@/app/components/Icons/Eyes";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
-import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
+import stylePopup from "@/app/components/Popup/PopupContent.module.css";
 import CloseIcon from "@/app/components/Icons/Close";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-const ProjectsPage = () => {
+const StructureProjects = () => {
+    const [openPopup, setOpenPopup] = useState(false);
     const [projectTags, setProjectTags] = useState([]);
 
     const [projectForm, setProjectForm] = useState({
@@ -30,6 +30,31 @@ const ProjectsPage = () => {
     });
 
     const [participants, setParticipants] = useState([]);
+
+    useEffect(() => {
+        const fetchProjectTags = async () => {
+            try {
+                const res = await fetch(`${API_URL}/os_tags/tag_projects`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data?.error || "Erreur lors du chargement des tags projets");
+                }
+
+                setProjectTags(data?.os_tag_project ?? data?.tags ?? data ?? []);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        fetchProjectTags();
+    }, []);
 
     const handleProjectChange = (e) => {
         const { name, value } = e.target;
@@ -76,111 +101,55 @@ const ProjectsPage = () => {
         console.log("CREATE PROJECT PAYLOAD =", payload);
     };
 
-    const [projects, setProjects] = useState([]);
-    const [projectDetails, setProjectDetails] = useState([]);
-    const [openPopupCreate, setOpenPopupCreate] = useState(false);
-    const [openPopupEdit, setOpenPopupEdit] = useState(false);
-    const [formValues, setFormValues] = React.useState({
-        id: "",
-        id_param_structure: "",
-        description: "",
-        date_start: "",
-        date_end: "",
-        id_status: "",
-    });
-
-    const openCreate = () => setOpenPopupCreate(true);
-    const closeCreate = () => setOpenPopupCreate(false);
-    const closeEdit = () => setOpenPopupEdit(false);
-
-    const handleCreateConfirm = (event) => {
-        event.preventDefault();
-        closeCreate();
-    };
-
-    const openEdit = (project) => {
-        setFormValues({
-            id: project?.id || "",
-            id_param_structure: project?.id_param_structure || "",
-            description: project?.description || "",
-            date_start: project?.date_start || "",
-            date_end: project?.date_end || "",
-            id_status: project?.id_status || "",
-        });
-        setOpenPopupEdit(true);
-    };
-
-    const handleFormChange = (key) => (event) => {
-        setFormValues((prev) => ({
-            ...prev,
-            [key]: event.target.value,
-        }));
-    };
-
-    // Fetch all necessary data on component mount
-    useEffect(() => {
-        const controller = new AbortController();
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
-            signal: controller.signal,
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                const list = Array.isArray(data) ? data : data?.projects || [];
-                const detailsFromProjects = list
-                    .map((project) => project?.project_detail)
-                    .filter(Boolean);
-                setProjects(list);
-                setProjectDetails(data?.projectDetails || detailsFromProjects);
-                setProjectTags(data?.tagProjects || []);
-            })
-            .catch((err) => {
-                if (err?.name !== "AbortError") {
-                    console.error(err);
-                }
-            });
-
-        const fetchProjectTags = async () => {
-            try {
-                const res = await fetch(`${API_URL}/os_tags/tag_projects`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data?.error || "Erreur lors du chargement des tags projets");
-                }
-
-                setProjectTags(data?.os_tag_project ?? data?.tags ?? data ?? []);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        fetchProjectTags();
-    }, []);
-
-    const projectDetailById = React.useMemo(() => {
-        const map = new Map();
-        projectDetails.forEach((detail) => {
-            if (detail && detail.id) {
-                map.set(detail.id, detail);
-            }
-        });
-        return map;
-    }, [projectDetails]);
+    const sampleProjects = [
+        {
+            id: 1,
+            name: "SOS Business",
+            company: "SOS Business",
+            role: "Multi-rôle",
+            tag: "Incubation",
+            members: [
+                {
+                    firstName: "Florino",
+                    lastName: "JEAN",
+                    email: "demo.intervenant@skailup.com",
+                    avatar: "/avatar1.jpg",
+                },
+            ],
+            activity: "7 programmes",
+        },
+        {
+            id: 2,
+            name: "Za'Earth",
+            company: "Za'Earth",
+            role: "Coach",
+            tag: "Accélération",
+            members: [
+                {
+                    firstName: "Dipo",
+                    lastName: "BANDO",
+                    email: "test.i2@skailup.com",
+                    avatar: "/avatar2.jpg",
+                },
+                {
+                    firstName: "Julie",
+                    lastName: "Lafontaine",
+                    email: "julie.laf@skailup.com",
+                    avatar: "/avatar4.jpg",
+                },
+            ],
+            activity: "Prévisions+",
+        },
+    ];
 
     return (
         <div className={style["structure-layout"]}>
             <Popup
-                open={openPopupCreate}
+                open={openPopup}
                 title="Créer un projet et inviter ses participants"
-                onClose={() => setOpenPopupCreate(false)}
+                onClose={() => setOpenPopup(false)}
             >
-                <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
+                <form className={stylePopup.form} onSubmit={handleCreateProject}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
                             <label>
@@ -345,7 +314,7 @@ const ProjectsPage = () => {
                             <div className={style.tools}>
                                 <FilterProjects />
                                 <button
-                                    onClick={() => setOpenPopupCreate(true)}
+                                    onClick={() => setOpenPopup(true)}
                                     className="buttons-primary-reversed"
                                 >
                                     <FiPlusCircle className="buttons-icon" /> Nouveau projet
@@ -368,7 +337,7 @@ const ProjectsPage = () => {
                         </thead>
 
                         <tbody>
-                            {projects.map((project) => (
+                            {sampleProjects.map((project) => (
                                 <tr key={project.id}>
                                     <td>
                                         <span className={style.roleBadge}>
@@ -376,69 +345,24 @@ const ProjectsPage = () => {
                                         </span>
                                     </td>
 
-                                    <td>{project.name}</td>
+                                    <td>{project.company}</td>
 
                                     <td>{project.tag}</td>
 
                                     <td className={style.colProject}>
-                                        {(project.project_users || [])
-                                            .map((link) => (
-                                                `${link.user_details?.first_name || ""} ${link.user_details?.last_name || ""}`
-                                                    .trim()
-                                            ))
-                                            .filter(Boolean)
-                                            .join(", ") || "-"}
+                                        <ListUsersInSession users={project.members} />
                                     </td>
 
                                     <td className={style.emailCell}>
-                                        {(() => {
-                                            { project.email }
-                                            return project.email
-                                        })()}
+                                        {project.members.map((member) => member.email).join(", ")}
                                     </td>
 
-                                    <td>
-                                        {(project.project_programs || [])
-                                            .map((link) => link.program?.description || link.program?.description)
-                                            .filter(Boolean)
-                                            .join(", ") || "-"}
+                                    <td className={style.activity}>
+                                        {project.activity}
                                     </td>
 
-                                    <td>
-                                        <div className={style.actions}>
-                                            <div>
-                                                <EyesIcon />
-                                            </div>
-                                            <div
-                                                className="cursorOn"
-                                                role="button"
-                                                aria-label="Modifier le projet"
-                                                onClick={() => openEdit(project)}
-                                            >
-                                                <svg
-                                                    width="16"
-                                                    height="16"
-                                                    viewBox="0 0 24 24"
-                                                    fill="none"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                >
-                                                    <path
-                                                        d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25Z"
-                                                        fill="currentColor"
-                                                    />
-                                                    <path
-                                                        d="M20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
-                                                        fill="currentColor"
-                                                    />
-                                                </svg>
-                                            </div>
-                                            <div
-                                                className="cursorOn"
-                                                onClick={() => onViewProgram(program.id)}
-                                            >
-                                                <GoToIcon />
-                                            </div>
-                                        </div>
+                                    <td className={style.actions}>
+                                        <EyesIcon />
                                     </td>
                                 </tr>
                             ))}
@@ -450,4 +374,4 @@ const ProjectsPage = () => {
     );
 };
 
-export default ProjectsPage;
+export default StructureProjects;
