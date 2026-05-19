@@ -9,6 +9,7 @@ import EyesIcon from "@/app/components/Icons/Eyes";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
 import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
+import CloseIcon from "@/app/components/Icons/Close";
 
 const ProjectsPage = () => {
 
@@ -17,6 +18,17 @@ const ProjectsPage = () => {
     const [tagProjects, setTagProjects] = useState([]);
     const [openPopupCreate, setOpenPopupCreate] = useState(false);
     const [openPopupEdit, setOpenPopupEdit] = useState(false);
+    const [projectForm, setProjectForm] = useState({
+        project_name: "",
+        project_tag: "",
+        note: "",
+    });
+    const [participantForm, setParticipantForm] = useState({
+        email: "",
+        last_name: "",
+        first_name: "",
+    });
+    const [participants, setParticipants] = useState([]);
     const [formValues, setFormValues] = React.useState({
         id: "",
         id_param_structure: "",
@@ -33,6 +45,40 @@ const ProjectsPage = () => {
     const handleCreateConfirm = (event) => {
         event.preventDefault();
         closeCreate();
+    };
+
+    const handleProjectChange = (event) => {
+        const { name, value } = event.target;
+        setProjectForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleParticipantChange = (event) => {
+        const { name, value } = event.target;
+        setParticipantForm((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const handleAddParticipant = () => {
+        const hasValue = Object.values(participantForm).some(Boolean);
+        if (!hasValue) {
+            return;
+        }
+
+        setParticipants((prev) => [...prev, participantForm]);
+        setParticipantForm({
+            email: "",
+            last_name: "",
+            first_name: "",
+        });
+    };
+
+    const handleRemoveParticipant = (index) => {
+        setParticipants((prev) => prev.filter((_, idx) => idx !== index));
     };
 
     const openEdit = (project) => {
@@ -90,6 +136,154 @@ const ProjectsPage = () => {
 
     return (
         <div className={style["structure-layout"]}>
+            <Popup
+                open={openPopupCreate}
+                title="Créer un projet et inviter ses participants"
+                onClose={() => setOpenPopupCreate(false)}
+            >
+                <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Nom du projet / de l’entreprise<span>*</span>
+                            </label>
+                            <input
+                                className="inputs"
+                                name="project_name"
+                                value={projectForm.project_name}
+                                onChange={handleProjectChange}
+                                required
+                            />
+                        </div>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Tag du projet<span>*</span>
+                            </label>
+                            <select
+                                className="inputs"
+                                name="project_tag"
+                                value={projectForm.project_tag}
+                                onChange={handleProjectChange}
+                                required
+                            >
+                                <option value="">Sélectionner un tag</option>
+                                {tagProjects.map((tag) => (
+                                    <option key={tag.id} value={tag.id}>
+                                        {tag.lang_fr}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p style={{ marginBottom: "12px", fontWeight: 500 }}>
+                            Invitez les participants du projet
+                            <span style={{ color: "#d11" }}>*</span>
+                        </p>
+
+                        <div className={stylePopup.row}>
+                            <div className={stylePopup.field}>
+                                <label>
+                                    Mail<span>*</span>
+                                </label>
+                                <input
+                                    className="inputs"
+                                    name="email"
+                                    type="email"
+                                    value={participantForm.email}
+                                    onChange={handleParticipantChange}
+                                />
+                            </div>
+
+                            <div className={stylePopup.field}>
+                                <label>
+                                    Nom<span>*</span>
+                                </label>
+                                <input
+                                    className="inputs"
+                                    name="last_name"
+                                    value={participantForm.last_name}
+                                    onChange={handleParticipantChange}
+                                />
+                            </div>
+
+                            <div className={stylePopup.field}>
+                                <label>
+                                    Prénom<span>*</span>
+                                </label>
+                                <input
+                                    className="inputs"
+                                    name="first_name"
+                                    value={participantForm.first_name}
+                                    onChange={handleParticipantChange}
+                                />
+                            </div>
+
+                            <div className={stylePopup.field}>
+                                <label style={{ visibility: "hidden" }}>
+                                    Ajouter
+                                </label>
+                                <button
+                                    type="button"
+                                    className="buttons-primary"
+                                    onClick={handleAddParticipant}
+                                >
+                                    Ajouter
+                                </button>
+                            </div>
+                        </div>
+
+                        <p style={{ color: "#ec7f3d", fontSize: "14px", marginTop: "8px" }}>
+                            Remarque : le 1er participant ajouté sera l'administrateur du projet
+                        </p>
+
+                        {participants.length > 0 && (
+                            <div className={stylePopup.participantList}>
+                                {participants.map((participant, index) => (
+                                    <div
+                                        key={`${participant.email}-${index}`}
+                                        className={
+                                            index === 0
+                                                ? `${stylePopup.participantItem} ${stylePopup.participantItemFirst}`
+                                                : stylePopup.participantItem
+                                        }
+                                    >
+                                        <span>
+                                            {participant.first_name} {participant.last_name} — {participant.email}
+                                        </span>
+
+                                        <div
+                                            onClick={() => handleRemoveParticipant(index)}
+                                            className={stylePopup.removeParticipant}
+                                        >
+                                            <CloseIcon />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={stylePopup.field}>
+                        <label>Note interne</label>
+                        <textarea
+                            className="inputs"
+                            name="note"
+                            placeholder="Note interne"
+                            value={projectForm.note}
+                            onChange={handleProjectChange}
+                            rows={5}
+                            style={{ resize: "none", minHeight: "100px" }}
+                        />
+                    </div>
+
+                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                        Inviter
+                    </button>
+                </form>
+            </Popup>
+
             <div className={style["structure-main"]}>
                 <div className={style["structure-content"]}>
                     <h2>Projets</h2>
@@ -112,8 +306,8 @@ const ProjectsPage = () => {
                             <div className={style.tools}>
                                 <FilterProjects />
                                 <button
+                                    onClick={() => setOpenPopupCreate(true)}
                                     className="buttons-primary-reversed"
-                                    onClick={openCreate}
                                 >
                                     <FiPlusCircle className="buttons-icon" /> Nouveau projet
                                 </button>
@@ -126,7 +320,8 @@ const ProjectsPage = () => {
                             <tr>
                                 <th className="th-first th-100">Rôle</th>
                                 <th className="th-150">Projet</th>
-                                <th className=" th-150">Participant(s)</th>
+                                <th className="th-150">Tag</th>
+                                <th className="th-150">Participant(s)</th>
                                 <th className="th-150">Email(s)</th>
                                 <th className="th-150">Programmes</th>
                                 <th className="th-last th-100">Actions</th>
@@ -143,6 +338,8 @@ const ProjectsPage = () => {
                                     </td>
 
                                     <td>{project.name}</td>
+
+                                    <td>{project.tag}</td>
 
                                     <td className={style.colProject}>
                                         {(project.project_users || [])
@@ -208,170 +405,6 @@ const ProjectsPage = () => {
                             ))}
                         </tbody>
                     </table>
-
-                    {/* Popup de création de projet */}
-                    <Popup open={openPopupCreate} onClose={closeCreate} title="Créer un projet et inviter ses participants">
-                        <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Nom du projet / de l’entreprise<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("description")}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Mail<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("email")}
-                                    />
-                                </div>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Nom<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("nom")}
-                                    />
-                                </div>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Prénom<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("prenom")}
-                                    />
-                                </div>
-                                <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
-                                    Ajouter
-                                </button>
-                            </div>
-
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Note interne
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        placeholder="Note interne"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("note")}
-                                    />
-                                </div>
-                            </div>
-
-                            <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
-                                Continuer
-                            </button>
-                        </form>
-                    </Popup>
-
-                    {/* Popup de modification de projet */}
-                    <Popup open={openPopupEdit} onClose={closeEdit} title="Modifier le projet">
-                        <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Nom du projet / de l’entreprise<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("description")}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Mail<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("email")}
-                                    />
-                                </div>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Nom<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("nom")}
-                                    />
-                                </div>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Prénom<span>*</span>
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("prenom")}
-                                    />
-                                </div>
-                                <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
-                                    Ajouter
-                                </button>
-                            </div>
-
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <label>
-                                        Note interne
-                                    </label>
-                                    <input
-                                        className="inputs"
-                                        type="text"
-                                        placeholder="Note interne"
-                                        required
-                                        value={formValues.name}
-                                        onChange={handleFormChange("note")}
-                                    />
-                                </div>
-                            </div>
-
-                            <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
-                                Continuer
-                            </button>
-                        </form>
-                    </Popup>
                 </div>
             </div>
         </div>

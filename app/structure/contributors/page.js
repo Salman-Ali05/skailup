@@ -11,6 +11,7 @@ import Popup from "@/app/components/Popup/Popup";
 import { showToast } from "nextjs-toast-notify";
 import { useUser } from "@/app/utils/contexts/userContext";
 import Multiselect from "@/app/components/Multiselect/Multiselect";
+import { formatDate } from "@/app/utils/fct/dateFormatter";
 
 const StructureContributors = () => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -79,11 +80,34 @@ const StructureContributors = () => {
                 showToast.error("Impossible de charger les listes de rôles/statuts");
             }
         };
+        const fetchContributors = async () => {
+            try {
+                const res = await fetch(`${API_URL}/contributors`, {
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${token}`
+                    },
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    throw new Error(data?.error || "Erreur lors du chargement des contributeurs");
+                }
+
+                setContributors(data ?? []);
+            } catch (e) {
+                console.error(e);
+                showToast.error("Impossible de charger la liste des contributeurs");
+            }
+        };
 
         fetchTags();
+        fetchContributors();
+    }, []);
 
-        return () => controller.abort();
-    }, [token]);
+    console.log(contributors);
 
     const handleInviteContrib = async (e) => {
         e.preventDefault();
@@ -154,71 +178,23 @@ const StructureContributors = () => {
         }
     };
 
+    const getRoleLabel = (contributor) => {
+        const tag1 = contributor?.tags?.Tag1 ?? [];
+
+        if (tag1.length > 1) {
+            return "Multi-rôle";
+        }
+
+        if (tag1.length === 1) {
+            return tag1[0]?.lang_fr;
+        }
+
+        return "-";
+    };
+
     return (
         <div className={style["structure-layout"]}>
-            <div className={style["structure-main"]}>
-                <div className={style["structure-content"]}>
-                    <h2>Intervenants</h2>
-
-                    <div className={style.headerRow}>
-                        <div className="headerActions">
-                            <div className="tabs">
-                                <div className="tab tabActive">
-                                    <p>
-                                        Inscrit <span>(7)</span>
-                                    </p>
-                                </div>
-                                <div className="tab">
-                                    <p>
-                                        Invitation <span>(1)</span>
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className={style.tools}>
-                                <FilterContributors />
-                                <button
-                                    className="buttons-primary-reversed"
-                                    onClick={() => setOpenPopup(true)}
-                                >
-                                    <FiPlusCircle className="buttons-icon" /> Nouvel intervenant
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <table className={style["contributors-table"]}>
-                        <thead>
-                            <tr>
-                                <th className="th-first th-150">Intervenant</th>
-                                <th className="th-150">Société</th>
-                                <th className="th-150">Email</th>
-                                <th className="th-100">Rôle</th>
-                                <th className="th-100">Dernière connexion</th>
-                                <th className="th-150">Programmes</th>
-                                <th className="th-last th-100">Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {contributors.map((contributor) => (
-                                <tr key={contributor.id}>
-                                    <td>
-                                        <span className={style.roleBadge}>
-                                            {contributor.role}
-                                        </span>
-                                    </td>
-
-                                    <td>{contributor.contributor_details?.name || ""}</td>
-
-                                    <td>{contributor.contributor_details?.email || ""}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <Popup open={openPopup} onClose={() => setOpenPopup(false)}>
+            <Popup open={openPopup} title="Nouvel intervenant" onClose={() => setOpenPopup(false)}>
                 <form className={stylePopup.form} onSubmit={handleInviteContrib}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
@@ -298,6 +274,92 @@ const StructureContributors = () => {
                     </button>
                 </form>
             </Popup>
+
+            <div className={style["structure-main"]}>
+                <div className={style["structure-content"]}>
+                    <h2>Intervenants</h2>
+
+                    <div className={style.headerRow}>
+                        <div className="headerActions">
+                            <div className="tabs">
+                                <div className="tab tabActive">
+                                    <p>
+                                        Inscrit <span>(7)</span>
+                                    </p>
+                                </div>
+                                <div className="tab">
+                                    <p>
+                                        Invitation <span>(1)</span>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className={style.tools}>
+                                <FilterContributors />
+                                <button
+                                    className="buttons-primary-reversed"
+                                    onClick={() => setOpenPopup(true)}
+                                >
+                                    <FiPlusCircle className="buttons-icon" /> Nouvel intervenant
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table className={style["contributors-table"]}>
+                        <thead>
+                            <tr>
+                                <th className="th-first th-150">Intervenant</th>
+                                <th className="th-150">Société</th>
+                                <th className="th-150">Email</th>
+                                <th className="th-100">Rôle</th>
+                                <th className="th-100">Dernière connexion</th>
+                                <th className="th-150">Programmes</th>
+                                <th className="th-last th-100">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {contributors.map((c) => (
+                                <tr key={c.id}>
+                                    <td className={style.colContributor}>
+                                        <div className={style.avatarWrap}>
+                                            <Image
+                                                src={c.user_details?.photo_url || "/woman.png"}
+                                                alt={c.name || "Intervenant"}
+                                                width={40}
+                                                height={40}
+                                                className={style.avatar}
+                                            />
+                                            <div className={style.nameWrap}>
+                                                <div className={style.name}>
+                                                    {c.user_details?.first_name} {c.user_details?.last_name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td>{c.name}</td>
+
+                                    <td className={style.emailCell}>{c.email}</td>
+
+                                    <td>
+                                        <span className={style.roleBadge}>{getRoleLabel(c)}</span>
+                                    </td>
+
+                                    <td>{formatDate(c.user_details?.last_connect)}</td>
+
+                                    <td className={style.programs}>{c.programs || "0 programme"}</td>
+
+                                    <td className={style.actions}>
+                                        <EyesIcon />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     );
 };
