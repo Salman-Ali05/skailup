@@ -14,7 +14,21 @@ import CloseIcon from "@/app/components/Icons/Close";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProjectsPage = () => {
+    const [projects, setProjects] = useState([]);
+    const [projectDetails, setProjectDetails] = useState([]);
+    const [openPopupCreate, setOpenPopupCreate] = useState(false);
+    const [openPopupEdit, setOpenPopupEdit] = useState(false);
     const [projectTags, setProjectTags] = useState([]);
+    const [participants, setParticipants] = useState([]);
+
+    const [formValues, setFormValues] = React.useState({
+        id: "",
+        id_param_structure: "",
+        description: "",
+        date_start: "",
+        date_end: "",
+        id_status: "",
+    });
 
     const [projectForm, setProjectForm] = useState({
         project_name: "",
@@ -28,8 +42,6 @@ const ProjectsPage = () => {
         last_name: "",
         first_name: "",
     });
-
-    const [participants, setParticipants] = useState([]);
 
     const handleProjectChange = (e) => {
         const { name, value } = e.target;
@@ -65,29 +77,66 @@ const ProjectsPage = () => {
         );
     };
 
-    const handleCreateProject = (e) => {
+    const handleCreateProject = async (e) => {
         e.preventDefault();
 
+        
+
+        if (!projectForm.project_name || !projectForm.project_tag) {
+            return;
+        }
+
+        const primaryEmail = participants[0]?.email || "";
+        if (!primaryEmail) {
+            return;
+        }
+
+        // On prépare le payload pour la création du projet
         const payload = {
-            ...projectForm,
+            name: projectForm.project_name,
+            id_tag_project: projectForm.project_tag,
+            email: primaryEmail,
+            note: projectForm.note,
             participants,
         };
 
-        console.log("CREATE PROJECT PAYLOAD =", payload);
-    };
+        // On envoie la requête de création du projet avec les participants
+        try {
+            const res = await fetch(`${API_URL}/projects`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(payload),
+            });
 
-    const [projects, setProjects] = useState([]);
-    const [projectDetails, setProjectDetails] = useState([]);
-    const [openPopupCreate, setOpenPopupCreate] = useState(false);
-    const [openPopupEdit, setOpenPopupEdit] = useState(false);
-    const [formValues, setFormValues] = React.useState({
-        id: "",
-        id_param_structure: "",
-        description: "",
-        date_start: "",
-        date_end: "",
-        id_status: "",
-    });
+            const data = await res.json();
+            if (!res.ok) {
+                throw new Error(data?.error || "Erreur lors de la creation du projet");
+            }
+            
+            const listRes = await fetch(`${API_URL}/projects`);
+            const listData = await listRes.json();
+            const list = Array.isArray(listData) ? listData : listData.projects || [];
+
+            setProjects(list); 
+            setOpenPopupCreate(false);
+            setProjectForm({
+                project_name: "",
+                project_status: "",
+                project_tag: "",
+                note: "",
+            });
+            setParticipants([]);
+            setParticipantForm({
+                email: "",
+                last_name: "",
+                first_name: "",
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
     const openCreate = () => setOpenPopupCreate(true);
     const closeCreate = () => setOpenPopupCreate(false);
@@ -132,7 +181,6 @@ const ProjectsPage = () => {
                     .filter(Boolean);
                 setProjects(list);
                 setProjectDetails(data?.projectDetails || detailsFromProjects);
-                setProjectTags(data?.tagProjects || []);
             })
             .catch((err) => {
                 if (err?.name !== "AbortError") {
@@ -173,6 +221,8 @@ const ProjectsPage = () => {
         return map;
     }, [projectDetails]);
 
+
+
     return (
         <div className={style["structure-layout"]}>
             <Popup
@@ -180,7 +230,7 @@ const ProjectsPage = () => {
                 title="Créer un projet et inviter ses participants"
                 onClose={() => setOpenPopupCreate(false)}
             >
-                <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
+                <form className={stylePopup.form} onSubmit={handleCreateProject}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
                             <label>
@@ -359,7 +409,6 @@ const ProjectsPage = () => {
                             <tr>
                                 <th className="th-first th-100">Rôle</th>
                                 <th className="th-150">Projet</th>
-                                <th className="th-150">Tag</th>
                                 <th className="th-150">Participant(s)</th>
                                 <th className="th-150">Email(s)</th>
                                 <th className="th-150">Programmes</th>
@@ -370,15 +419,16 @@ const ProjectsPage = () => {
                         <tbody>
                             {projects.map((project) => (
                                 <tr key={project.id}>
+
                                     <td>
-                                        <span className={style.roleBadge}>
-                                            {project.role}
-                                        </span>
+                                        {project.tag_project?.code ? (
+                                            <span className={style.roleBadge}>{project.tag_project.code}</span>
+                                        ) : null}
+                                        <br />
+                                        {project.description}
                                     </td>
 
                                     <td>{project.name}</td>
-
-                                    <td>{project.tag}</td>
 
                                     <td className={style.colProject}>
                                         {(project.project_users || [])
