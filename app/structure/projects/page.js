@@ -6,7 +6,6 @@ import style from "./projects.module.css";
 import stylePopup from "@/app/components/Popup/PopupContent.module.css";
 import FilterProjects from "@/app/components/Filters/FilterProjects/FilterProjects";
 import EyesIcon from "@/app/components/Icons/Eyes";
-import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
 import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
 import CloseIcon from "@/app/components/Icons/Close";
@@ -16,8 +15,7 @@ import { useUser } from "@/app/utils/contexts/userContext";
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProjectsPage = () => {
-    const { session } = useUser();
-    const token = session?.access_token;
+    const { loading, isAuthenticated, authFetch } = useUser();
 
     const [projects, setProjects] = useState([]);
     const [projectDetails, setProjectDetails] = useState([]);
@@ -40,12 +38,8 @@ const ProjectsPage = () => {
 
     const fetchProjects = async () => {
         try {
-            const res = await fetch(`${API_URL}/projects`, {
+            const res = await authFetch(`${API_URL}/projects`, {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                },
             });
 
             const data = await res.json();
@@ -55,12 +49,8 @@ const ProjectsPage = () => {
             }
 
             const list = Array.isArray(data) ? data : data?.projects || [];
-            const detailsFromProjects = list
-                .map((project) => project?.project_detail)
-                .filter(Boolean);
 
             setProjects(list);
-            setProjectDetails(data?.projectDetails || detailsFromProjects);
         } catch (err) {
             console.error(err);
             showToast.error("Impossible de charger la liste des projets");
@@ -91,11 +81,14 @@ const ProjectsPage = () => {
 
     useEffect(() => {
         fetchProjectTags();
+    }, []);
 
-        if (token) {
-            fetchProjects();
-        }
-    }, [token]);
+    useEffect(() => {
+        if (loading) return;
+        if (!isAuthenticated) return;
+
+        fetchProjects();
+    }, [loading, isAuthenticated]);
 
     const handleProjectChange = (e) => {
         const { name, value } = e.target;
@@ -135,7 +128,7 @@ const ProjectsPage = () => {
     const handleCreateProject = async (e) => {
         e.preventDefault();
 
-        if (!token) {
+        if (loading || !isAuthenticated) {
             showToast.error("Session expirée. Veuillez vous reconnecter.");
             return;
         }
@@ -161,12 +154,8 @@ const ProjectsPage = () => {
         };
 
         try {
-            const res = await fetch(`${API_URL}/users/project`, {
+            const res = await authFetch(`${API_URL}/users/project`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
                 body: JSON.stringify(payload),
             });
 
@@ -203,33 +192,12 @@ const ProjectsPage = () => {
     };
 
     const openEdit = (project) => {
-        setFormValues({
-            id: project?.id || "",
-            id_param_structure: project?.id_param_structure || "",
-            description: project?.description || "",
-            date_start: project?.date_start || "",
-            date_end: project?.date_end || "",
-            id_status: project?.id_status || "",
-        });
-
-        setOpenPopupEdit(true);
+        console.log("EDIT PROJECT =", project);
     };
 
     const handleViewProject = (projectId) => {
         console.log("VIEW PROJECT =", projectId);
     };
-
-    const projectDetailById = React.useMemo(() => {
-        const map = new Map();
-
-        projectDetails.forEach((detail) => {
-            if (detail && detail.id) {
-                map.set(detail.id, detail);
-            }
-        });
-
-        return map;
-    }, [projectDetails]);
 
     return (
         <div className={style["structure-layout"]}>

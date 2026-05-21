@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, React } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./str_contributors.module.css";
@@ -15,7 +15,7 @@ import { formatDate } from "@/app/utils/fct/dateFormatter";
 
 const StructureContributors = () => {
     const API_URL = process.env.NEXT_PUBLIC_API_URL;
-    const { user, session } = useUser();
+    const { loading, isAuthenticated, authFetch } = useUser();
     const token = session?.access_token;
     const [openPopup, setOpenPopup] = useState(false);
 
@@ -33,58 +33,64 @@ const StructureContributors = () => {
     const [contributors, setContributors] = useState([]);
 
 
+    const fetchTags = async () => {
+        try {
+            const res = await fetch(`${API_URL}/os_tags/tag_contributors`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Erreur lors du chargement des tags");
+            }
+
+            setOsTagsContributor({
+                os_tag1: data?.os_tag1 ?? [],
+                os_tag2: data?.os_tag2 ?? [],
+                os_tag3: data?.os_tag3 ?? [],
+            });
+        } catch (e) {
+            console.error(e);
+            showToast.error("Impossible de charger les listes de rôles/statuts");
+        }
+    };
+    const fetchContributors = async () => {
+        try {
+            const res = await fetch(`${API_URL}/contributors`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Erreur lors du chargement des contributeurs");
+            }
+
+            setContributors(data ?? []);
+        } catch (e) {
+            console.error(e);
+            showToast.error("Impossible de charger la liste des contributeurs");
+        }
+    };
+
     useEffect(() => {
-        const fetchTags = async () => {
-            try {
-                const res = await fetch(`${API_URL}/os_tags/tag_contributors`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data?.error || "Erreur lors du chargement des tags");
-                }
-
-                setOsTagsContributor({
-                    os_tag1: data?.os_tag1 ?? [],
-                    os_tag2: data?.os_tag2 ?? [],
-                    os_tag3: data?.os_tag3 ?? [],
-                });
-            } catch (e) {
-                console.error(e);
-                showToast.error("Impossible de charger les listes de rôles/statuts");
-            }
-        };
-        const fetchContributors = async () => {
-            try {
-                const res = await fetch(`${API_URL}/contributors`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                        Authorization: `Bearer ${token}`
-                    },
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data?.error || "Erreur lors du chargement des contributeurs");
-                }
-
-                setContributors(data ?? []);
-            } catch (e) {
-                console.error(e);
-                showToast.error("Impossible de charger la liste des contributeurs");
-            }
-        };
-
         fetchTags();
-        fetchContributors();
     }, []);
+
+    useEffect(() => {
+        if (loading) return;
+        if (!isAuthenticated) return;
+
+        fetchContributors();
+    }, [loading, isAuthenticated]);
 
     console.log(contributors);
 
@@ -102,7 +108,7 @@ const StructureContributors = () => {
             return;
         }
 
-        if (!token) {
+        if (loading || !isAuthenticated) {
             showToast.error("Session expirée. Veuillez vous reconnecter.");
             return;
         }
@@ -119,12 +125,8 @@ const StructureContributors = () => {
         };
 
         try {
-            const res = await fetch(`${API_URL}/users/contributor`, {
+            const res = await authFetch(`${API_URL}/users/contributor`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
                 body: JSON.stringify(payload),
             });
 
@@ -143,6 +145,7 @@ const StructureContributors = () => {
             }
 
             showToast.success("Invitation envoyée avec succès !");
+            await fetchContributors();
             setOpenPopup(false);
             form.reset();
 
