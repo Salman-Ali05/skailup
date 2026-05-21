@@ -32,29 +32,8 @@ const StructureContributors = () => {
 
     const [contributors, setContributors] = useState([]);
 
+
     useEffect(() => {
-        if (!token) return;
-
-        const controller = new AbortController();
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/contributors`, {
-            signal: controller.signal,
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                const list = Array.isArray(data) ? data : data?.contributors || [];
-                setContributors(list);
-            })
-            .catch((err) => {
-                if (err?.name !== "AbortError") {
-                    console.error(err);
-                }
-            });
-
         const fetchTags = async () => {
             try {
                 const res = await fetch(`${API_URL}/os_tags/tag_contributors`, {

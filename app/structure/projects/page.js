@@ -10,25 +10,20 @@ import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
 import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
 import CloseIcon from "@/app/components/Icons/Close";
+import { showToast } from "nextjs-toast-notify";
+import { useUser } from "@/app/utils/contexts/userContext";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 const ProjectsPage = () => {
+    const { session } = useUser();
+    const token = session?.access_token;
+
     const [projects, setProjects] = useState([]);
     const [projectDetails, setProjectDetails] = useState([]);
     const [openPopupCreate, setOpenPopupCreate] = useState(false);
-    const [openPopupEdit, setOpenPopupEdit] = useState(false);
     const [projectTags, setProjectTags] = useState([]);
     const [participants, setParticipants] = useState([]);
-
-    const [formValues, setFormValues] = React.useState({
-        id: "",
-        id_param_structure: "",
-        description: "",
-        date_start: "",
-        date_end: "",
-        id_status: "",
-    });
 
     const [projectForm, setProjectForm] = useState({
         project_name: "",
@@ -42,6 +37,65 @@ const ProjectsPage = () => {
         last_name: "",
         first_name: "",
     });
+
+    const fetchProjects = async () => {
+        try {
+            const res = await fetch(`${API_URL}/projects`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Erreur lors du chargement des projets");
+            }
+
+            const list = Array.isArray(data) ? data : data?.projects || [];
+            const detailsFromProjects = list
+                .map((project) => project?.project_detail)
+                .filter(Boolean);
+
+            setProjects(list);
+            setProjectDetails(data?.projectDetails || detailsFromProjects);
+        } catch (err) {
+            console.error(err);
+            showToast.error("Impossible de charger la liste des projets");
+        }
+    };
+
+    const fetchProjectTags = async () => {
+        try {
+            const res = await fetch(`${API_URL}/os_tags/tag_projects`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                throw new Error(data?.error || "Erreur lors du chargement des tags projets");
+            }
+
+            setProjectTags(data?.os_tag_project ?? data?.tags ?? data ?? []);
+        } catch (err) {
+            console.error(err);
+            showToast.error("Impossible de charger les tags projets");
+        }
+    };
+
+    useEffect(() => {
+        fetchProjectTags();
+
+        if (token) {
+            fetchProjects();
+        }
+    }, [token]);
 
     const handleProjectChange = (e) => {
         const { name, value } = e.target;
@@ -59,6 +113,7 @@ const ProjectsPage = () => {
             !participantForm.last_name ||
             !participantForm.first_name
         ) {
+            showToast.error("Veuillez remplir les informations du participant");
             return;
         }
 
@@ -80,18 +135,23 @@ const ProjectsPage = () => {
     const handleCreateProject = async (e) => {
         e.preventDefault();
 
-        
+        if (!token) {
+            showToast.error("Session expirée. Veuillez vous reconnecter.");
+            return;
+        }
 
         if (!projectForm.project_name || !projectForm.project_tag) {
+            showToast.error("Veuillez renseigner le nom et le tag du projet");
             return;
         }
 
         const primaryEmail = participants[0]?.email || "";
+
         if (!primaryEmail) {
+            showToast.error("Veuillez ajouter au moins un participant");
             return;
         }
 
-        // On prépare le payload pour la création du projet
         const payload = {
             name: projectForm.project_name,
             id_tag_project: projectForm.project_tag,
@@ -100,34 +160,37 @@ const ProjectsPage = () => {
             participants,
         };
 
-        // On envoie la requête de création du projet avec les participants
         try {
-            const res = await fetch(`${API_URL}/projects`, {
+            const res = await fetch(`${API_URL}/users/project`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify(payload),
             });
 
             const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data?.error || "Erreur lors de la creation du projet");
-            }
-            
-            const listRes = await fetch(`${API_URL}/projects`);
-            const listData = await listRes.json();
-            const list = Array.isArray(listData) ? listData : listData.projects || [];
 
-            setProjects(list); 
+            if (!res.ok) {
+                throw new Error(data?.error || "Erreur lors de la création du projet");
+            }
+
+            showToast.success("Projet créé avec succès");
+
+            await fetchProjects();
+
             setOpenPopupCreate(false);
+
             setProjectForm({
                 project_name: "",
                 project_status: "",
                 project_tag: "",
                 note: "",
             });
+
             setParticipants([]);
+
             setParticipantForm({
                 email: "",
                 last_name: "",
@@ -135,16 +198,8 @@ const ProjectsPage = () => {
             });
         } catch (err) {
             console.error(err);
+            showToast.error(`Erreur : ${err.message}`);
         }
-    };
-
-    const openCreate = () => setOpenPopupCreate(true);
-    const closeCreate = () => setOpenPopupCreate(false);
-    const closeEdit = () => setOpenPopupEdit(false);
-
-    const handleCreateConfirm = (event) => {
-        event.preventDefault();
-        closeCreate();
     };
 
     const openEdit = (project) => {
@@ -156,72 +211,25 @@ const ProjectsPage = () => {
             date_end: project?.date_end || "",
             id_status: project?.id_status || "",
         });
+
         setOpenPopupEdit(true);
     };
 
-    const handleFormChange = (key) => (event) => {
-        setFormValues((prev) => ({
-            ...prev,
-            [key]: event.target.value,
-        }));
+    const handleViewProject = (projectId) => {
+        console.log("VIEW PROJECT =", projectId);
     };
-
-    // Fetch all necessary data on component mount
-    useEffect(() => {
-        const controller = new AbortController();
-
-        fetch(`${process.env.NEXT_PUBLIC_API_URL}/projects`, {
-            signal: controller.signal,
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                const list = Array.isArray(data) ? data : data?.projects || [];
-                const detailsFromProjects = list
-                    .map((project) => project?.project_detail)
-                    .filter(Boolean);
-                setProjects(list);
-                setProjectDetails(data?.projectDetails || detailsFromProjects);
-            })
-            .catch((err) => {
-                if (err?.name !== "AbortError") {
-                    console.error(err);
-                }
-            });
-
-        const fetchProjectTags = async () => {
-            try {
-                const res = await fetch(`${API_URL}/os_tags/tag_projects`, {
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-
-                const data = await res.json();
-
-                if (!res.ok) {
-                    throw new Error(data?.error || "Erreur lors du chargement des tags projets");
-                }
-
-                setProjectTags(data?.os_tag_project ?? data?.tags ?? data ?? []);
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        fetchProjectTags();
-    }, []);
 
     const projectDetailById = React.useMemo(() => {
         const map = new Map();
+
         projectDetails.forEach((detail) => {
             if (detail && detail.id) {
                 map.set(detail.id, detail);
             }
         });
+
         return map;
     }, [projectDetails]);
-
-
 
     return (
         <div className={style["structure-layout"]}>
@@ -244,6 +252,7 @@ const ProjectsPage = () => {
                                 required
                             />
                         </div>
+
                         <div className={stylePopup.field}>
                             <label>
                                 Tag du projet<span>*</span>
@@ -382,12 +391,12 @@ const ProjectsPage = () => {
                             <div className="tabs">
                                 <div className="tab tabActive">
                                     <p>
-                                        Inscrit <span>(7)</span>
+                                        Inscrit <span>({projects.length})</span>
                                     </p>
                                 </div>
                                 <div className="tab">
                                     <p>
-                                        Invitation <span>(1)</span>
+                                        Invitation <span>(0)</span>
                                     </p>
                                 </div>
                             </div>
@@ -419,37 +428,45 @@ const ProjectsPage = () => {
                         <tbody>
                             {projects.map((project) => (
                                 <tr key={project.id}>
-
                                     <td>
-                                        {project.tag_project?.code ? (
-                                            <span className={style.roleBadge}>{project.tag_project.code}</span>
-                                        ) : null}
-                                        <br />
-                                        {project.description}
+                                        {project.tag_project ? (
+                                            <span className={style.roleBadge}>
+                                                {project.tag_project.lang_fr}
+                                            </span>
+                                        ) : (
+                                            "-"
+                                        )}
                                     </td>
 
                                     <td>{project.name}</td>
 
-                                    <td className={style.colProject}>
-                                        {(project.project_users || [])
-                                            .map((link) => (
-                                                `${link.user_details?.first_name || ""} ${link.user_details?.last_name || ""}`
-                                                    .trim()
-                                            ))
-                                            .filter(Boolean)
-                                            .join(", ") || "-"}
-                                    </td>
-
-                                    <td className={style.emailCell}>
+                                    <td>
                                         {(() => {
-                                            { project.email }
-                                            return project.email
+                                            const participants = (project.project_users || [])
+                                                .map((link) =>
+                                                    `${link.user_details?.first_name || ""} ${link.user_details?.last_name || ""}`.trim()
+                                                )
+                                                .filter(Boolean);
+
+                                            if (participants.length === 0) {
+                                                return "-";
+                                            }
+
+                                            if (participants.length > 2) {
+                                                return `${participants[0]} +${participants.length - 1}`;
+                                            }
+
+                                            return participants.join(", ");
                                         })()}
                                     </td>
 
                                     <td>
+                                        {project.email || "-"}
+                                    </td>
+
+                                    <td>
                                         {(project.project_programs || [])
-                                            .map((link) => link.program?.description || link.program?.description)
+                                            .map((link) => link.program?.description)
                                             .filter(Boolean)
                                             .join(", ") || "-"}
                                     </td>
@@ -459,6 +476,7 @@ const ProjectsPage = () => {
                                             <div>
                                                 <EyesIcon />
                                             </div>
+
                                             <div
                                                 className="cursorOn"
                                                 role="button"
@@ -482,9 +500,10 @@ const ProjectsPage = () => {
                                                     />
                                                 </svg>
                                             </div>
+
                                             <div
                                                 className="cursorOn"
-                                                onClick={() => onViewProgram(program.id)}
+                                                onClick={() => handleViewProject(project.id)}
                                             >
                                                 <GoToIcon />
                                             </div>

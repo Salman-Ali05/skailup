@@ -36,11 +36,6 @@
     background: #f5f6f8;
 }
 
-.colProject {
-    display: flex;
-    align-items: center
-}
-
 .avatarWrap {
     display: flex;
     align-items: center;
@@ -54,14 +49,6 @@
 
 .name {
     font-weight: 600
-}
-
-.emailCell {
-    color: #777;
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap
 }
 
 .roleBadge {
