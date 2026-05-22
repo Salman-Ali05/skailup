@@ -13,10 +13,11 @@ import { useUser } from "@/app/utils/contexts/userContext";
 import Multiselect from "@/app/components/Multiselect/Multiselect";
 import { formatDate } from "@/app/utils/fct/dateFormatter";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
 const StructureContributors = () => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL;
     const { loading, isAuthenticated, authFetch } = useUser();
-    const token = session?.access_token;
+
     const [openPopup, setOpenPopup] = useState(false);
 
     const [osTagsContributor, setOsTagsContributor] = useState({
@@ -24,6 +25,7 @@ const StructureContributors = () => {
         os_tag2: [],
         os_tag3: [],
     });
+
     const [selectedTags, setSelectedTags] = useState({
         Tag1: [],
         Tag2: [],
@@ -31,7 +33,6 @@ const StructureContributors = () => {
     });
 
     const [contributors, setContributors] = useState([]);
-
 
     const fetchTags = async () => {
         try {
@@ -58,14 +59,11 @@ const StructureContributors = () => {
             showToast.error("Impossible de charger les listes de rôles/statuts");
         }
     };
+
     const fetchContributors = async () => {
         try {
-            const res = await fetch(`${API_URL}/contributors`, {
+            const res = await authFetch(`${API_URL}/contributors`, {
                 method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`
-                },
             });
 
             const data = await res.json();
@@ -91,8 +89,6 @@ const StructureContributors = () => {
 
         fetchContributors();
     }, [loading, isAuthenticated]);
-
-    console.log(contributors);
 
     const handleInviteContrib = async (e) => {
         e.preventDefault();
@@ -133,6 +129,7 @@ const StructureContributors = () => {
             const text = await res.text();
 
             let data;
+
             try {
                 data = text ? JSON.parse(text) : {};
             } catch {
@@ -145,7 +142,9 @@ const StructureContributors = () => {
             }
 
             showToast.success("Invitation envoyée avec succès !");
+
             await fetchContributors();
+
             setOpenPopup(false);
             form.reset();
 
@@ -176,7 +175,11 @@ const StructureContributors = () => {
 
     return (
         <div className={style["structure-layout"]}>
-            <Popup open={openPopup} title="Nouvel intervenant" onClose={() => setOpenPopup(false)}>
+            <Popup
+                open={openPopup}
+                title="Nouvel intervenant"
+                onClose={() => setOpenPopup(false)}
+            >
                 <form className={stylePopup.form} onSubmit={handleInviteContrib}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
@@ -218,7 +221,10 @@ const StructureContributors = () => {
                                 options={osTagsContributor.os_tag1}
                                 value={selectedTags.Tag1}
                                 onChange={(value) =>
-                                    setSelectedTags((prev) => ({ ...prev, Tag1: value }))
+                                    setSelectedTags((prev) => ({
+                                        ...prev,
+                                        Tag1: value,
+                                    }))
                                 }
                                 placeholder="Sélectionner un rôle"
                             />
@@ -231,7 +237,10 @@ const StructureContributors = () => {
                                 options={osTagsContributor.os_tag2}
                                 value={selectedTags.Tag2}
                                 onChange={(value) =>
-                                    setSelectedTags((prev) => ({ ...prev, Tag2: value }))
+                                    setSelectedTags((prev) => ({
+                                        ...prev,
+                                        Tag2: value,
+                                    }))
                                 }
                                 placeholder="Sélectionner un statut"
                             />
@@ -244,14 +253,20 @@ const StructureContributors = () => {
                                 options={osTagsContributor.os_tag3}
                                 value={selectedTags.Tag3}
                                 onChange={(value) =>
-                                    setSelectedTags((prev) => ({ ...prev, Tag3: value }))
+                                    setSelectedTags((prev) => ({
+                                        ...prev,
+                                        Tag3: value,
+                                    }))
                                 }
                                 placeholder="Sélectionner une situation"
                             />
                         </div>
                     </div>
 
-                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                    <button
+                        type="submit"
+                        className={`${stylePopup.submitBtn} buttons-primary`}
+                    >
                         Inviter
                     </button>
                 </form>
@@ -266,18 +281,19 @@ const StructureContributors = () => {
                             <div className="tabs">
                                 <div className="tab tabActive">
                                     <p>
-                                        Inscrit <span>(7)</span>
+                                        Inscrit <span>({contributors.length})</span>
                                     </p>
                                 </div>
                                 <div className="tab">
                                     <p>
-                                        Invitation <span>(1)</span>
+                                        Invitation <span>(0)</span>
                                     </p>
                                 </div>
                             </div>
 
                             <div className={style.tools}>
                                 <FilterContributors />
+
                                 <button
                                     className="buttons-primary-reversed"
                                     onClick={() => setOpenPopup(true)}
@@ -302,36 +318,46 @@ const StructureContributors = () => {
                         </thead>
 
                         <tbody>
-                            {contributors.map((c) => (
-                                <tr key={c.id}>
+                            {contributors.map((contributor) => (
+                                <tr key={contributor.id}>
                                     <td className={style.colContributor}>
                                         <div className={style.avatarWrap}>
                                             <Image
-                                                src={c.user_details?.photo_url || "/woman.png"}
-                                                alt={c.name || "Intervenant"}
+                                                src={contributor.user_details?.photo_url || "/woman.png"}
+                                                alt={contributor.name || "Intervenant"}
                                                 width={40}
                                                 height={40}
                                                 className={style.avatar}
                                             />
+
                                             <div className={style.nameWrap}>
                                                 <div className={style.name}>
-                                                    {c.user_details?.first_name} {c.user_details?.last_name}
+                                                    {contributor.user_details?.first_name}{" "}
+                                                    {contributor.user_details?.last_name}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
 
-                                    <td>{c.name}</td>
+                                    <td>{contributor.name || "-"}</td>
 
-                                    <td className={style.emailCell}>{c.email}</td>
-
-                                    <td>
-                                        <span className={style.roleBadge}>{getRoleLabel(c)}</span>
+                                    <td className={style.emailCell}>
+                                        {contributor.email || contributor.user?.email || "-"}
                                     </td>
 
-                                    <td>{formatDate(c.user_details?.last_connect)}</td>
+                                    <td>
+                                        <span className={style.roleBadge}>
+                                            {getRoleLabel(contributor)}
+                                        </span>
+                                    </td>
 
-                                    <td className={style.programs}>{c.programs || "0 programme"}</td>
+                                    <td>
+                                        {formatDate(contributor.user_details?.last_connect)}
+                                    </td>
+
+                                    <td className={style.programs}>
+                                        {contributor.programs || "0 programme"}
+                                    </td>
 
                                     <td className={style.actions}>
                                         <EyesIcon />
