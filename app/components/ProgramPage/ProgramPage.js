@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./ProgramPage.module.css";
 import stylePopup from "@/app/components/Popup/PopupContent.module.css";
@@ -10,6 +10,7 @@ import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
 
 const ProgramPage = ({
+    status = [],
     programs = [],
     programProjects = [],
     projects = [],
@@ -23,6 +24,7 @@ const ProgramPage = ({
     onEditProgram = () => { },
     onCreateProgram = () => { },
 }) => {
+    const [activeStatusId, setActiveStatusId] = useState("");
     const [openPopupCreate, setOpenPopupCreate] = useState(false);
     const [openPopupEdit, setOpenPopupEdit] = useState(false);
     const [formValues, setFormValues] = React.useState({
@@ -33,6 +35,49 @@ const ProgramPage = ({
         date_end: "",
         id_status: "",
     });
+
+    const statusList = useMemo(() => {
+        const source = status.length > 0 ? status : statusOptions;
+
+        return source
+            .filter((item) => item && item.id)
+            .map((item) => {
+                const label =
+                    item.lang_fr ||
+                    item.lang_en ||
+                    item.label ||
+                    item.name ||
+                    item.description ||
+                    item.value ||
+                    item.status ||
+                    "-";
+
+                return {
+                    id: String(item.id),
+                    label,
+                };
+            });
+    }, [status, statusOptions]);
+
+    useEffect(() => {
+        if (!activeStatusId && statusList.length > 0) {
+            setActiveStatusId(statusList[0].id);
+        }
+    }, [activeStatusId, statusList]);
+
+    const filteredPrograms = useMemo(() => {
+        if (!activeStatusId) return programs;
+
+        return programs.filter((program) => {
+            return String(program.id_status) === String(activeStatusId);
+        });
+    }, [programs, activeStatusId]);
+
+    const getProgramCountByStatus = (statusId) => {
+        return programs.filter((program) => {
+            return String(program.id_status) === String(statusId);
+        }).length;
+    };
 
     const resetForm = () => {
         setFormValues({
@@ -90,11 +135,11 @@ const ProgramPage = ({
             description: program?.description || "",
             date_start: program?.date_start || "",
             date_end: program?.date_end || "",
-            id_status: program?.id_status || "",
+            id_status: program?.id_status ? String(program.id_status) : "",
         });
         setOpenPopupEdit(true);
     };
-    
+
     const handleFormChange = (key) => (event) => {
         setFormValues((prev) => ({
             ...prev,
@@ -122,8 +167,8 @@ const ProgramPage = ({
             ""
         );
     };
-    
-    const projectNameById = React.useMemo(() => {
+
+    const projectNameById = useMemo(() => {
         const map = new Map();
         projects.forEach((project) => {
             if (project && project.id) {
@@ -133,7 +178,7 @@ const ProgramPage = ({
         return map;
     }, [projects]);
 
-    const programProjectNames = React.useMemo(() => {
+    const programProjectNames = useMemo(() => {
         return programProjects.reduce((acc, link) => {
             if (!link || !link.id_program || !link.id_project) return acc;
             const name = projectNameById.get(link.id_project);
@@ -144,7 +189,7 @@ const ProgramPage = ({
         }, {});
     }, [programProjects, projectNameById]);
 
-    const tagParamValueById = React.useMemo(() => {
+    const tagParamValueById = useMemo(() => {
         const map = new Map();
         tagParamStructures.forEach((tag) => {
             if (!tag || !tag.id) return;
@@ -154,7 +199,7 @@ const ProgramPage = ({
         return map;
     }, [tagParamStructures]);
 
-    const contributorNameById = React.useMemo(() => {
+    const contributorNameById = useMemo(() => {
         const map = new Map();
         contributors.forEach((contributor) => {
             if (contributor && contributor.id) {
@@ -164,7 +209,7 @@ const ProgramPage = ({
         return map;
     }, [contributors]);
 
-    const programContributorNames = React.useMemo(() => {
+    const programContributorNames = useMemo(() => {
         return programContributors.reduce((acc, link) => {
             if (!link || !link.id_program || !link.id_contributor) return acc;
             const name = contributorNameById.get(link.id_contributor);
@@ -175,7 +220,7 @@ const ProgramPage = ({
         }, {});
     }, [programContributors, contributorNameById]);
 
-    const tagParamOptions = React.useMemo(() => {
+    const tagParamOptions = useMemo(() => {
         return tagParamStructures
             .filter((tag) => tag && tag.id)
             .map((tag) => {
@@ -184,22 +229,15 @@ const ProgramPage = ({
             });
     }, [tagParamStructures]);
 
-    const statusOptionsList = React.useMemo(() => {
-        return statusOptions
-            .filter((status) => status && status.id)
-            .map((status) => {
-                const label = status.lang_fr || status.label || status.name || status.description || status.value || "-";
-                return { id: status.id, label };
-            });
-    }, [statusOptions]);
-
     const statusLabelById = React.useMemo(() => {
         const map = new Map();
-        statusOptionsList.forEach((status) => {
-            map.set(status.id, status.label || "");
+
+        statusList.forEach((item) => {
+            map.set(item.id, item.label || "");
         });
+
         return map;
-    }, [statusOptionsList]);
+    }, [statusList]);
 
     return (
         <div className={style["structure-content"]}>
@@ -208,18 +246,18 @@ const ProgramPage = ({
             <div className={style.headerRow}>
                 <div className="headerActions">
                     <div className="tabs">
-                        <div className="tab tabActive">
-                            <p>
-                                Ouvert <span>({programsCountByStatusOpened})</span>
-                            </p>
-                        </div>
-                        <div className="tab">
-                            <p>
-                                En cours <span>({programsCountByStatusClosed})</span>
-                            </p>
-                        </div>
+                        {statusList.map((item) => (
+                            <div
+                                key={item.id}
+                                className={`tab ${activeStatusId === item.id ? "tabActive" : ""}`}
+                                onClick={() => setActiveStatusId(item.id)}
+                            >
+                                <p>
+                                    {item.label} <span>({getProgramCountByStatus(item.id)})</span>
+                                </p>
+                            </div>
+                        ))}
                     </div>
-
                     <div className={style.tools}>
                         <FilterContributors />
                         <button
@@ -246,7 +284,7 @@ const ProgramPage = ({
                 </thead>
 
                 <tbody>
-                    {programs.map((program) => {
+                    {filteredPrograms.map((program) => {
                         return (
                             <tr key={program.id}>
                                 <td>
@@ -257,7 +295,7 @@ const ProgramPage = ({
                                     ) : null} <br></br>
                                     {program.description}
                                 </td>
-                                
+
                                 <td>{formatDate(program.date_start)}</td>
 
                                 <td>{formatDate(program.date_end)}</td>
@@ -272,7 +310,7 @@ const ProgramPage = ({
 
                                 <td>
                                     <span className={style.roleBadge}>
-                                        {statusLabelById.get(program.id_status) || program.id_status || ""}
+                                        {statusLabelById.get(String(program.id_status)) || program.id_status || ""}
                                     </span>
                                 </td>
 
@@ -351,7 +389,7 @@ const ProgramPage = ({
                                 onChange={handleFormChange("id_status")}
                             >
                                 <option value="" disabled hidden></option>
-                                {statusOptionsList.map((status) => (
+                                {statusList.map((status) => (
                                     <option key={status.id} value={status.id}>
                                         {status.label}
                                     </option>
@@ -444,7 +482,7 @@ const ProgramPage = ({
                                 onChange={handleFormChange("id_status")}
                             >
                                 <option value="" disabled hidden></option>
-                                {statusOptionsList.map((status) => (
+                                {statusList.map((status) => (
                                     <option key={status.id} value={status.id}>
                                         {status.label}
                                     </option>
@@ -465,7 +503,7 @@ const ProgramPage = ({
                                 required
                                 value={formValues.description}
                                 onChange={handleFormChange("description")}
-                                
+
                             />
                         </div>
                     </div>
