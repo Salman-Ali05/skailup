@@ -8,6 +8,8 @@ import FilterContributors from "@/app/components/Filters/FilterContributors/Filt
 import EyesIcon from "@/app/components/Icons/Eyes";
 import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
+import PenIcon from "../Icons/Pen";
+import { avoidDoubleClicks } from "@/app/utils/fct/avoidDoubleClicks";
 
 const ProgramPage = ({
     status = [],
@@ -18,15 +20,13 @@ const ProgramPage = ({
     contributors = [],
     tagParamStructures = [],
     statusOptions = [],
-    programsCountByStatusOpened = 0,
-    programsCountByStatusClosed = 0,
     onViewProgram,
     onEditProgram = () => { },
     onCreateProgram = () => { },
 }) => {
     const [activeStatusId, setActiveStatusId] = useState("");
-    const [openPopupCreate, setOpenPopupCreate] = useState(false);
-    const [openPopupEdit, setOpenPopupEdit] = useState(false);
+    const [openPopup, setOpenPopup] = useState(false);
+    const [popupMode, setPopupMode] = useState("create");
     const [formValues, setFormValues] = React.useState({
         id: "",
         id_param_structure: "",
@@ -79,65 +79,77 @@ const ProgramPage = ({
         }).length;
     };
 
+    const isEditMode = popupMode === "edit";
+
+    const toInputDate = (date) => {
+        if (!date) return "";
+        return String(date).split("T")[0];
+    };
+
+    const getEmptyForm = () => ({
+        id: "",
+        id_param_structure: "",
+        description: "",
+        date_start: "",
+        date_end: "",
+        id_status: activeStatusId || statusList[0]?.id || "",
+    });
+
     const resetForm = () => {
-        setFormValues({
-            id: "",
-            id_param_structure: "",
-            description: "",
-            date_start: "",
-            date_end: "",
-            id_status: "",
-        });
+        setFormValues(getEmptyForm());
+    };
+
+    const closePopup = () => {
+        setOpenPopup(false);
+        setPopupMode("create");
+        resetForm();
     };
 
     const openCreate = () => {
-        resetForm();
-        setOpenPopupCreate(true);
-    };
-    const closeCreate = () => setOpenPopupCreate(false);
-
-    const handleCreateConfirm = async (event) => {
-        event.preventDefault();
-        if (
-            !formValues.id_param_structure ||
-            !formValues.description ||
-            !formValues.date_start ||
-            !formValues.date_end ||
-            !formValues.id_status
-        ) {
-            return;
-        }
-        onCreateProgram({ ...formValues });
-        closeCreate();
-    };
-
-    const closeEdit = () => setOpenPopupEdit(false);
-
-    const handleEditConfirm = async (event) => {
-        event.preventDefault();
-        if (
-            !formValues.id_param_structure ||
-            !formValues.description ||
-            !formValues.date_start ||
-            !formValues.date_end ||
-            !formValues.id_status
-        ) {
-            return;
-        }
-        onEditProgram({ ...formValues });
-        closeEdit();
+        setPopupMode("create");
+        setFormValues(getEmptyForm());
+        setOpenPopup(true);
     };
 
     const openEdit = (program) => {
+        setPopupMode("edit");
+
         setFormValues({
-            id: program?.id || "",
-            id_param_structure: program?.id_param_structure || "",
+            id: program?.id ? String(program.id) : "",
+            id_param_structure: program?.id_param_structure
+                ? String(program.id_param_structure)
+                : "",
             description: program?.description || "",
-            date_start: program?.date_start || "",
-            date_end: program?.date_end || "",
+            date_start: toInputDate(program?.date_start),
+            date_end: toInputDate(program?.date_end),
             id_status: program?.id_status ? String(program.id_status) : "",
         });
-        setOpenPopupEdit(true);
+
+        setOpenPopup(true);
+    };
+
+    const isFormValid = () => {
+        return (
+            formValues.id_param_structure &&
+            formValues.description &&
+            formValues.date_start &&
+            formValues.date_end &&
+            formValues.id_status
+        );
+    };
+
+    const handleProgramConfirm = async (event) => {
+        event.preventDefault();
+
+        if (!isFormValid()) return;
+
+        if (popupMode === "edit") {
+            onEditProgram({ ...formValues });
+        } else {
+            onCreateProgram({ ...formValues });
+        }
+
+        closePopup();
     };
 
     const handleFormChange = (key) => (event) => {
@@ -264,7 +276,7 @@ const ProgramPage = ({
                             className="buttons-primary-reversed"
                             onClick={openCreate}
                         >
-                            <FiPlusCircle className="buttons-icon" /> Nouveau programme
+                            <FiPlusCircle className="buttons-icon" /> Créer une Cohorte
                         </button>
                     </div>
                 </div>
@@ -309,44 +321,27 @@ const ProgramPage = ({
                                 </td>
 
                                 <td>
-                                    <span className={style.roleBadge}>
-                                        {statusLabelById.get(String(program.id_status)) || program.id_status || ""}
+                                    <span className={(statusLabelById.get(String(program.id_status)) === "Ouvert") ? "greenTag" : "redTag"}>
+                                        {statusLabelById.get(String(program.id_status))}
                                     </span>
                                 </td>
 
                                 <td>
                                     <div className={style.actions}>
-                                        <div>
-                                            <EyesIcon />
-                                        </div>
                                         <div
                                             className="cursorOn"
-                                            role="button"
-                                            aria-label="Modifier le programme"
-                                            onClick={() => openEdit(program)}
-                                        >
-                                            <svg
-                                                width="16"
-                                                height="16"
-                                                viewBox="0 0 24 24"
-                                                fill="none"
-                                                xmlns="http://www.w3.org/2000/svg"
-                                            >
-                                                <path
-                                                    d="M3 17.25V21H6.75L17.81 9.94L14.06 6.19L3 17.25Z"
-                                                    fill="currentColor"
-                                                />
-                                                <path
-                                                    d="M20.71 7.04C21.1 6.65 21.1 6.02 20.71 5.63L18.37 3.29C17.98 2.9 17.35 2.9 16.96 3.29L15.13 5.12L18.88 8.87L20.71 7.04Z"
-                                                    fill="currentColor"
-                                                />
-                                            </svg>
-                                        </div>
-                                        <div
-                                            className="cursorOn"
-                                            onClick={() => onViewProgram(program.id)}
+                                            onClick={() => onViewProgram(program)}
                                         >
                                             <GoToIcon />
+                                        </div>
+                                        <div className="cursorOn"
+                                            role="button"
+                                            aria-label="Modifier le programme"
+                                            onClick={() => openEdit(program)}>
+                                            <PenIcon />
+                                        </div>
+                                        <div>
+                                            <EyesIcon />
                                         </div>
                                     </div>
                                 </td>
@@ -355,14 +350,18 @@ const ProgramPage = ({
                     })}
                 </tbody>
             </table>
-            {/* Popup de création de programme */}
-            <Popup open={openPopupCreate} onClose={closeCreate} title="Nouveau programme">
-                <form className={stylePopup.form} onSubmit={handleCreateConfirm}>
+            <Popup
+                open={openPopup}
+                onClose={closePopup}
+                title={isEditMode ? "Modifier la cohorte" : "Nouvelle cohorte"}
+            >
+                <form className={stylePopup.form} onSubmit={handleProgramConfirm}>
                     <div className={stylePopup.row}>
                         <div className={stylePopup.field}>
                             <label>
                                 Type de programme<span>*</span>
                             </label>
+
                             <select
                                 className="inputs"
                                 required
@@ -370,6 +369,7 @@ const ProgramPage = ({
                                 onChange={handleFormChange("id_param_structure")}
                             >
                                 <option value="" disabled hidden></option>
+
                                 {tagParamOptions.map((tag) => (
                                     <option key={tag.id} value={tag.id}>
                                         {tag.label}
@@ -382,6 +382,7 @@ const ProgramPage = ({
                             <label>
                                 Statut<span>*</span>
                             </label>
+
                             <select
                                 className="inputs"
                                 required
@@ -389,6 +390,7 @@ const ProgramPage = ({
                                 onChange={handleFormChange("id_status")}
                             >
                                 <option value="" disabled hidden></option>
+
                                 {statusList.map((status) => (
                                     <option key={status.id} value={status.id}>
                                         {status.label}
@@ -403,6 +405,7 @@ const ProgramPage = ({
                             <label>
                                 Nom / ref. Cohorte<span>*</span>
                             </label>
+
                             <input
                                 className="inputs"
                                 type="text"
@@ -419,6 +422,7 @@ const ProgramPage = ({
                             <label>
                                 Date de debut<span>*</span>
                             </label>
+
                             <input
                                 className="inputs"
                                 type="date"
@@ -432,6 +436,7 @@ const ProgramPage = ({
                             <label>
                                 Date de fin<span>*</span>
                             </label>
+
                             <input
                                 className="inputs"
                                 type="date"
@@ -442,102 +447,11 @@ const ProgramPage = ({
                         </div>
                     </div>
 
-                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
-                        Continuer
-                    </button>
-                </form>
-            </Popup>
-
-            {/* Popup de modification de programme */}
-            <Popup open={openPopupEdit} onClose={closeEdit} title="Modifier le programme">
-                <form className={stylePopup.form} onSubmit={handleEditConfirm}>
-                    <div className={stylePopup.row}>
-                        <div className={stylePopup.field}>
-                            <label>
-                                Type de programme<span>*</span>
-                            </label>
-                            <select
-                                className="inputs"
-                                required
-                                value={formValues.id_param_structure}
-                                onChange={handleFormChange("id_param_structure")}
-                            >
-                                <option value="" disabled hidden></option>
-                                {tagParamOptions.map((tag) => (
-                                    <option key={tag.id} value={tag.id}>
-                                        {tag.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <div className={stylePopup.field}>
-                            <label>
-                                Statut<span>*</span>
-                            </label>
-                            <select
-                                className="inputs"
-                                required
-                                value={formValues.id_status}
-                                onChange={handleFormChange("id_status")}
-                            >
-                                <option value="" disabled hidden></option>
-                                {statusList.map((status) => (
-                                    <option key={status.id} value={status.id}>
-                                        {status.label}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className={stylePopup.row}>
-                        <div className={stylePopup.field}>
-                            <label>
-                                Nom / ref. Cohorte<span>*</span>
-                            </label>
-                            <input
-                                className="inputs"
-                                type="text"
-                                placeholder="Nom / ref. Cohorte"
-                                required
-                                value={formValues.description}
-                                onChange={handleFormChange("description")}
-
-                            />
-                        </div>
-                    </div>
-
-                    <div className={stylePopup.row}>
-                        <div className={stylePopup.field}>
-                            <label>
-                                Date de debut<span>*</span>
-                            </label>
-                            <input
-                                className="inputs"
-                                type="date"
-                                required
-                                value={formValues.date_start}
-                                onChange={handleFormChange("date_start")}
-                            />
-                        </div>
-
-                        <div className={stylePopup.field}>
-                            <label>
-                                Date de fin<span>*</span>
-                            </label>
-                            <input
-                                className="inputs"
-                                type="date"
-                                required
-                                value={formValues.date_end}
-                                onChange={handleFormChange("date_end")}
-                            />
-                        </div>
-                    </div>
-
-                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
-                        Continuer
+                    <button
+                        id="btnCreateProgram"
+                        type="submit"
+                        className={`${stylePopup.submitBtn} buttons-primary`} onClick={() => avoidDoubleClicks("btnCreateProgram")}>
+                        {isEditMode ? "Modifier" : "Créer"}
                     </button>
                 </form>
             </Popup>

@@ -82,6 +82,7 @@ body {
   color: #0f172a;
   flex: 1;
   height: 44px;
+  min-width: 200px;
 }
 
 .inputs::placeholder {
@@ -97,6 +98,11 @@ button {
   justify-content: center;
   gap: 8px;
   border-radius: 12px;
+}
+
+.disabled {
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 .buttons-primary {
@@ -305,6 +311,28 @@ p {
   padding: 2px 8px 0px 8px;
   font-size: 14px;
   font-weight: 500;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.greenTag{
+  font-weight: bold;
+  background-color: #EEF9F3;
+  color: #56C688;
+  border: none;
+  padding: 2px 8px 0px 8px;
+  font-size: 14px;
+  height: 24px;
+  border-radius: 6px;
+}
+
+.redTag{
+  font-weight: bold;
+  background-color: #F0E9EC;
+  color: #652344;
+  border: none;
+  padding: 2px 8px 0px 8px;
+  font-size: 14px;
   height: 24px;
   border-radius: 6px;
 }

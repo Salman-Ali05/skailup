@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { useRouteTo } from "@/app/utils/router";
 import style from "./actitvity.module.css";
@@ -10,7 +10,27 @@ const StructureActivity = () => {
     const routeTo = useRouteTo();
     const params = useParams();
     const { id } = params || {};
+    const [program, setProgram] = useState(null);
 
+    useEffect(() => {
+        const storedProgram = sessionStorage.getItem("selectedProgram");
+
+        if (!storedProgram) return;
+
+        try {
+            const parsedProgram = JSON.parse(storedProgram);
+
+            if (String(parsedProgram.id) === String(id)) {
+                setProgram(parsedProgram);
+            }
+        } catch (err) {
+            console.error("Impossible de récupérer le programme", err);
+        }
+    }, [id]);
+
+    const handleBack = () => {
+        router.push("/structure/programs");
+    };
     const sampleActivity = [
         {
             id: 1,
@@ -61,10 +81,11 @@ const StructureActivity = () => {
             <div className={style["structure-main"]}>
                 <ActivityPage
                     programId={id}
+                    program={program}
                     activities={sampleActivity}
                     onBack={() => routeTo("/structure/program")}
                     onViewActivity={handleViewActivity}
-                    onCreateActivity={() => {}}
+                    onCreateActivity={() => { }}
                 />
             </div>
         </div>

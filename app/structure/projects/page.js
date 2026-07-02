@@ -11,6 +11,7 @@ import Popup from "@/app/components/Popup/Popup";
 import CloseIcon from "@/app/components/Icons/Close";
 import { showToast } from "nextjs-toast-notify";
 import { useUser } from "@/app/utils/contexts/userContext";
+import { avoidDoubleClicks } from "@/app/utils/fct/avoidDoubleClicks";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -344,7 +345,7 @@ const ProjectsPage = () => {
                         />
                     </div>
 
-                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`}>
+                    <button type="submit" className={`${stylePopup.submitBtn} buttons-primary`} onClick={() => avoidDoubleClicks("inviteProjectBtn")} id="inviteProjectBtn">
                         Inviter
                     </button>
                 </form>

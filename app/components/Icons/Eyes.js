@@ -3,8 +3,8 @@
 import React from "react";
 import { IoEyeOutline } from "react-icons/io5";
 
-const EyesIcon = ({ size = 20, color = "#9a9d9c" }) => {
-    return <IoEyeOutline size={size} color={color} opacity={0.5}/>;
+const EyesIcon = ({ size = 20, color = "#1B43D0" }) => {
+    return <IoEyeOutline size={size} color={color}/>;
 };
 
 export default EyesIcon;

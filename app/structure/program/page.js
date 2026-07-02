@@ -23,12 +23,11 @@ const StructurePrograms = () => {
     const [contributors, setContributors] = useState([]);
     const [tagParamStructures, setTagParamStructures] = useState([]);
     const [statusOptions, setStatusOptions] = useState([]);
-    const [programsCountByStatusOpened, setProgramsCountByStatusOpened] = useState(0);
-    const [programsCountByStatusClosed, setProgramsCountByStatusClosed] = useState(0);
     const [status, setStatus] = useState([]);
 
-    const handleViewProgram = (programId) => {
-        router.push(`/structure/activity/${programId}`);
+    const handleViewProgram = (program) => {
+        sessionStorage.setItem("selectedProgram", JSON.stringify(program));
+        router.push(`/structure/activity/${program.id}`);
     };
 
     const fetchStatus = async () => {
@@ -81,33 +80,8 @@ const StructurePrograms = () => {
         }
     };
 
-    const fetchProgramCountByStatus = async (statusId, setter) => {
-        try {
-            const res = await authFetch(
-                `${API_URL}/programs/count/by-status?statusIds=${encodeURIComponent(statusId)}`,
-                {
-                    method: "GET",
-                }
-            );
-
-            const data = await res.json().catch(() => ({}));
-
-            if (!res.ok) {
-                throw new Error(data?.error || "Erreur lors du chargement du compteur");
-            }
-
-            setter(data?.count ?? 0);
-        } catch (err) {
-            console.error(err);
-            setter(0);
-        }
-    };
-
     const refreshProgramsData = async () => {
         await fetchPrograms();
-
-        await fetchProgramCountByStatus(openStatusId, setProgramsCountByStatusOpened);
-        await fetchProgramCountByStatus(closedStatusId, setProgramsCountByStatusClosed);
     };
 
     useEffect(() => {

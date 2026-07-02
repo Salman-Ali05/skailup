@@ -11,11 +11,18 @@ import GoToIcon from "@/app/components/Icons/GoTo";
 
 const ActivityPage = ({
     programId,
+    program,
     activities = [],
     onBack,
     onViewActivity,
     onCreateActivity,
 }) => {
+    const programType = program?.tag_param_structure?.label;
+
+    const programTitle = [programType, program?.description]
+        .filter(Boolean)
+        .join(" - ");
+
     const formatDate = (iso) => {
         if (!iso) return "-";
         const [y, m, d] = iso.split("-");
@@ -30,14 +37,13 @@ const ActivityPage = ({
 
         return { realized, nextSession, lastSession, missingActions };
     };
-
     return (
         <div className={style["structure-content"]}>
             <div className="cursorOn" onClick={onBack}>
                 <GoBackIcon />
             </div>
 
-            <h2>Programme : {programId}</h2>
+            <h2>Programme : {programTitle || programId}</h2>
 
             <div className={style.headerRow}>
                 <div className="headerActions">

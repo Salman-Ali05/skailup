@@ -12,6 +12,7 @@ import { showToast } from "nextjs-toast-notify";
 import { useUser } from "@/app/utils/contexts/userContext";
 import Multiselect from "@/app/components/Multiselect/Multiselect";
 import { formatDate } from "@/app/utils/fct/dateFormatter";
+import { avoidDoubleClicks } from "@/app/utils/fct/avoidDoubleClicks";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -90,11 +91,10 @@ const StructureContributors = () => {
         fetchContributors();
     }, [loading, isAuthenticated]);
 
-    const handleInviteContrib = async (e) => {
+    const handleInviteContrib = async (e, event) => {
         e.preventDefault();
 
         const form = e.currentTarget;
-
         if (
             selectedTags.Tag1.length === 0 ||
             selectedTags.Tag2.length === 0 ||
@@ -264,8 +264,9 @@ const StructureContributors = () => {
                     </div>
 
                     <button
+                        id="inviteContribBtn"
                         type="submit"
-                        className={`${stylePopup.submitBtn} buttons-primary`}
+                        className={`${stylePopup.submitBtn} buttons-primary`} onClick={() => avoidDoubleClicks("inviteContribBtn")}
                     >
                         Inviter
                     </button>
