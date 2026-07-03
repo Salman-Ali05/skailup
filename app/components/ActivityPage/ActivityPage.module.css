@@ -58,10 +58,6 @@
     font-size: 13px;
 }
 
-.activity {
-    color: #ff8a5b
-}
-
 .actions {
     display: flex;
     gap: 10px;
@@ -72,4 +68,10 @@
     border: none;
     cursor: pointer;
     color: #9aa0b4
+}
+
+.projectBadges {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }

@@ -10,6 +10,7 @@ import GoToIcon from "@/app/components/Icons/GoTo";
 import Popup from "@/app/components/Popup/Popup";
 import PenIcon from "../Icons/Pen";
 import { avoidDoubleClicks } from "@/app/utils/fct/avoidDoubleClicks";
+import NoItem from "../NoItem/NoItem";
 
 const ProgramPage = ({
     status = [],
@@ -282,74 +283,83 @@ const ProgramPage = ({
                 </div>
             </div>
 
-            <table className={style["contributors-table"]}>
-                <thead>
-                    <tr>
-                        <th className="th-first th-200">Programme</th>
-                        <th className="th-120">Début</th>
-                        <th className="th-120">Fin</th>
-                        <th className="th-150">Intervenants</th>
-                        <th className="th-150">Projets</th>
-                        <th className="th-100">Statut</th>
-                        <th className="th-last th-80">Actions</th>
-                    </tr>
-                </thead>
+            {filteredPrograms.length === 0 ? (
 
-                <tbody>
-                    {filteredPrograms.map((program) => {
-                        return (
-                            <tr key={program.id}>
-                                <td>
-                                    {program.id_param_structure ? (
-                                        <span>
-                                            {" "}{tagParamValueById.get(program.id_param_structure)}
+                <NoItem
+                    message="Aucun programme trouvé"
+                    subMessage="Vous pouvez créer un nouveau programme en cliquant sur le bouton ci-dessus."
+                />
+            ) : (
+
+                <table className={style["contributors-table"]}>
+                    <thead>
+                        <tr>
+                            <th className="th-first th-200">Programme</th>
+                            <th className="th-120">Début</th>
+                            <th className="th-120">Fin</th>
+                            <th className="th-150">Intervenants</th>
+                            <th className="th-150">Projets</th>
+                            <th className="th-100">Statut</th>
+                            <th className="th-last th-80">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {filteredPrograms.map((program) => {
+                            return (
+                                <tr key={program.id}>
+                                    <td>
+                                        {program.id_param_structure ? (
+                                            <span>
+                                                {" "}{tagParamValueById.get(program.id_param_structure)}
+                                            </span>
+                                        ) : null} <br></br>
+                                        {program.description}
+                                    </td>
+
+                                    <td>{formatDate(program.date_start)}</td>
+
+                                    <td>{formatDate(program.date_end)}</td>
+
+                                    <td>
+                                        {(programContributorNames[program.id] || []).join(", ")}
+                                    </td>
+
+                                    <td>
+                                        {(programProjectNames[program.id] || []).join(", ")}
+                                    </td>
+
+                                    <td>
+                                        <span className={(statusLabelById.get(String(program.id_status)) === "Ouvert") ? "greenTag" : "redTag"}>
+                                            {statusLabelById.get(String(program.id_status))}
                                         </span>
-                                    ) : null} <br></br>
-                                    {program.description}
-                                </td>
+                                    </td>
 
-                                <td>{formatDate(program.date_start)}</td>
-
-                                <td>{formatDate(program.date_end)}</td>
-
-                                <td>
-                                    {(programContributorNames[program.id] || []).join(", ")}
-                                </td>
-
-                                <td>
-                                    {(programProjectNames[program.id] || []).join(", ")}
-                                </td>
-
-                                <td>
-                                    <span className={(statusLabelById.get(String(program.id_status)) === "Ouvert") ? "greenTag" : "redTag"}>
-                                        {statusLabelById.get(String(program.id_status))}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <div className={style.actions}>
-                                        <div
-                                            className="cursorOn"
-                                            onClick={() => onViewProgram(program)}
-                                        >
-                                            <GoToIcon />
+                                    <td>
+                                        <div className={style.actions}>
+                                            <div
+                                                className="cursorOn"
+                                                onClick={() => onViewProgram(program)}
+                                            >
+                                                <GoToIcon />
+                                            </div>
+                                            <div className="cursorOn"
+                                                role="button"
+                                                aria-label="Modifier le programme"
+                                                onClick={() => openEdit(program)}>
+                                                <PenIcon />
+                                            </div>
+                                            <div>
+                                                <EyesIcon />
+                                            </div>
                                         </div>
-                                        <div className="cursorOn"
-                                            role="button"
-                                            aria-label="Modifier le programme"
-                                            onClick={() => openEdit(program)}>
-                                            <PenIcon />
-                                        </div>
-                                        <div>
-                                            <EyesIcon />
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        );
-                    })}
-                </tbody>
-            </table>
+                                    </td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
+            )}
             <Popup
                 open={openPopup}
                 onClose={closePopup}

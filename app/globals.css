@@ -284,6 +284,10 @@ p {
   color: #252525;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 /* divs */
 
 .cursorOn {
