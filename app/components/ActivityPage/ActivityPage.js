@@ -8,7 +8,12 @@ import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
 import EyesIcon from "@/app/components/Icons/Eyes";
 import GoBackIcon from "@/app/components/Icons/GoBack";
 import GoToIcon from "@/app/components/Icons/GoTo";
+import PenIcon from "../Icons/Pen";
 import NoItem from "../NoItem/NoItem";
+import { avoidDoubleClicks } from "@/app/utils/fct/avoidDoubleClicks";
+import Popup from "@/app/components/Popup/Popup";
+import stylePopup from "@/app/components/Popup/PopupContent.module.css";
+import Multiselect from "@/app/components/Multiselect/Multiselect";
 
 const ActivityPage = ({
     programId,
@@ -21,11 +26,62 @@ const ActivityPage = ({
     activityContribs = [],
     contributors = [],
     tagParamStructures = [],
+    tagParamTypes = [],
     onBack,
     onViewActivity,
-    onCreateActivity,
+    onCreateActivity = () => { },
+    onEditActivity = () => { },
+    durationOptionsSet = []
 }) => {
     const [activeStatusId, setActiveStatusId] = useState("");
+    const [openPopup, setOpenPopup] = useState(false);
+    const [popupMode, setPopupMode] = useState("create");
+
+    const [formValues, setFormValues] = useState({
+        id: "",
+        id_param_name: "",
+        name: "",
+        description: "",
+        emargement_evaluation: "",
+        number_session: "",
+        duration_in_minutes: "",
+        contribs: [],
+        includeAllProgramProjects: false,
+        projects: [],
+        is_planable: "false",
+        id_status: "",
+    });
+
+    const durationOptions = useMemo(() => {
+        return durationOptionsSet
+            .filter((option) => option)
+            .map((option) => {
+                const rawValue =
+                    option.value ??
+                    option.duration_in_minutes ??
+                    option.duration ??
+                    option.minutes ??
+                    "";
+
+                const label =
+                    option.lang_fr ||
+                    option.lang_en ||
+                    option.label ||
+                    option.display ||
+                    option.code ||
+                    option.name ||
+                    "-";
+
+                return {
+                    id: String(option.id || rawValue || label),
+                    value: String(rawValue),
+                    label,
+                };
+            })
+            .filter((option) => option.value);
+    }, [durationOptionsSet]);
+
+    const isEditMode = popupMode === "edit";
 
     const statusList = useMemo(() => {
         const source = status.length > 0 ? status : statusOptions;
@@ -68,6 +124,258 @@ const ActivityPage = ({
         return activities.filter((activity) => {
             return String(activity.id_status) === String(statusId);
         }).length;
+    };
+
+    const activityTypeParam = useMemo(() => {
+        return tagParamTypes.find((type) => {
+            return type.code === "Activities" || type.lang_fr === "Activités";
+        });
+    }, [tagParamTypes]);
+
+    const filteredTagParamStructures = useMemo(() => {
+        if (!activityTypeParam?.id) return [];
+
+        return tagParamStructures.filter((tag) => {
+            return String(tag.id_type_param) === String(activityTypeParam.id);
+        });
+    }, [tagParamStructures, activityTypeParam]);
+
+    const tagParamOptions = useMemo(() => {
+        return filteredTagParamStructures
+            .filter((tag) => tag && tag.id)
+            .map((tag) => {
+                const label =
+                    tag.label ||
+                    tag.name ||
+                    tag.description ||
+                    tag.tag ||
+                    tag.value ||
+                    "-";
+
+                return {
+                    id: String(tag.id),
+                    label,
+                    lang_fr: label,
+                };
+            });
+    }, [filteredTagParamStructures]);
+
+    const contributorOptions = useMemo(() => {
+        return contributors
+            .filter((contributor) => contributor && contributor.id)
+            .map((contributor) => {
+                const userName = [
+                    contributor.user_details?.first_name,
+                    contributor.user_details?.last_name,
+                ]
+                    .filter(Boolean)
+                    .join(" ");
+
+                const label = [
+                    userName,
+                    contributor.name,
+                ]
+                    .filter(Boolean)
+                    .join(" - ");
+
+                return {
+                    id: String(contributor.id),
+                    lang_fr: label || "-",
+                };
+            });
+    }, [contributors]);
+
+    const projectOptions = useMemo(() => {
+        return projects
+            .filter((project) => project && project.id)
+            .map((project) => {
+                const userName = [
+                    project.user?.first_name || project.user_details?.first_name,
+                    project.user?.last_name || project.user_details?.last_name,
+                ]
+                    .filter(Boolean)
+                    .join(" ");
+
+                const label = [
+                    project.name,
+                    userName,
+                ]
+                    .filter(Boolean)
+                    .join(" - ");
+
+                return {
+                    id: String(project.id),
+                    lang_fr: label || "-",
+                };
+            });
+    }, [projects]);
+
+    const getEmptyForm = () => ({
+        id: "",
+        id_param_name: "",
+        name: "",
+        description: "",
+        emargement_evaluation: "",
+        number_session: "",
+        duration_in_minutes: "",
+        contribs: [],
+        includeAllProgramProjects: false,
+        projects: [],
+        is_planable: "false",
+        id_status: activeStatusId || statusList[0]?.id || "",
+    });
+
+    const getEmargementEvaluationValue = (activity) => {
+        const isSignNeeded = Boolean(activity?.is_sign_needed);
+        const isNoteNeeded = Boolean(activity?.is_note_needed);
+
+        if (isSignNeeded && isNoteNeeded) return "both";
+        if (isSignNeeded) return "emargement";
+        if (isNoteNeeded) return "evaluation";
+
+        return "none";
+    };
+
+    const getActivityProjectIds = (activityId) => {
+        return activityProjects
+            .filter((link) => {
+                return String(link.id_activity) === String(activityId);
+            })
+            .map((link) => String(link.id_project))
+            .filter(Boolean);
+    };
+
+    const getActivityContribIds = (activityId) => {
+        return activityContribs
+            .filter((link) => {
+                return String(link.id_activity) === String(activityId);
+            })
+            .map((link) => String(link.id_contrib))
+            .filter(Boolean);
+    };
+
+    const resetForm = () => {
+        setFormValues(getEmptyForm());
+    };
+
+    const closePopup = () => {
+        setOpenPopup(false);
+        setPopupMode("create");
+        resetForm();
+    };
+
+    const openCreate = () => {
+        setPopupMode("create");
+        setFormValues(getEmptyForm());
+        setOpenPopup(true);
+    };
+
+    const openEdit = (activity) => {
+        setPopupMode("edit");
+
+        setFormValues({
+            id: activity?.id ? String(activity.id) : "",
+            id_param_name: activity?.id_param_name
+                ? String(activity.id_param_name)
+                : "",
+            name: activity?.name || "",
+            description: activity?.description || "",
+            emargement_evaluation: getEmargementEvaluationValue(activity),
+            number_session:
+                activity?.number_session !== null &&
+                    activity?.number_session !== undefined
+                    ? String(activity.number_session)
+                    : "",
+            duration_in_minutes:
+                activity?.duration_in_minutes !== null &&
+                    activity?.duration_in_minutes !== undefined
+                    ? String(activity.duration_in_minutes)
+                    : "",
+            contribs: getActivityContribIds(activity?.id),
+            includeAllProgramProjects: false,
+            projects: getActivityProjectIds(activity?.id),
+            is_planable: activity?.is_planable ? "true" : "false",
+            id_status: activity?.id_status ? String(activity.id_status) : "",
+        });
+
+        setOpenPopup(true);
+    };
+
+    const handleFormChange = (key) => (event) => {
+        setFormValues((prev) => ({
+            ...prev,
+            [key]: event.target.value,
+        }));
+    };
+
+    const handleIncludeAllProgramProjectsChange = (event) => {
+        const checked = event.target.checked;
+
+        setFormValues((prev) => ({
+            ...prev,
+            includeAllProgramProjects: checked,
+            projects: checked ? [] : prev.projects,
+        }));
+    };
+
+    const isFormValid = () => {
+        return (
+            formValues.id_param_name &&
+            formValues.name &&
+            formValues.emargement_evaluation &&
+            formValues.number_session &&
+            formValues.duration_in_minutes &&
+            formValues.is_planable !== "" &&
+            formValues.id_status
+        );
+    };
+
+    const handleActivityConfirm = async (event) => {
+        event.preventDefault();
+
+        if (!isFormValid()) return;
+
+        const projectsPayload = formValues.includeAllProgramProjects
+            ? projectOptions.map((project) => project.id)
+            : formValues.projects;
+
+        const payload = {
+            id: formValues.id,
+            id_param_name: formValues.id_param_name,
+            name: formValues.name,
+            description: formValues.description || null,
+
+            is_sign_needed:
+                formValues.emargement_evaluation === "emargement" ||
+                formValues.emargement_evaluation === "both",
+
+            is_note_needed:
+                formValues.emargement_evaluation === "evaluation" ||
+                formValues.emargement_evaluation === "both",
+
+            number_session: Number(formValues.number_session),
+            duration_in_minutes: Number(formValues.duration_in_minutes),
+
+            contribs: formValues.contribs,
+            projects: projectsPayload,
+
+            is_planable: formValues.is_planable === "true",
+
+            id_status: formValues.id_status,
+
+            is_finished: false,
+            is_priced: false,
+
+            rate_60minutes: formValues.contribs.map(() => 0),
+        };
+
+        if (popupMode === "edit") {
+            await onEditActivity(payload);
+        } else {
+            await onCreateActivity(payload);
+        }
+
+        closePopup();
     };
 
     const formatDate = (iso) => {
@@ -140,19 +448,12 @@ const ActivityPage = ({
         contributors.forEach((contributor) => {
             if (!contributor || !contributor.id) return;
 
-            const first =
-                contributor.user_details?.first_name ||
-                contributor.user_details?.fname ||
-                contributor.contributor_details?.first_name ||
-                contributor.contributor_details?.fname;
-
-            const last =
-                contributor.user_details?.last_name ||
-                contributor.user_details?.lname ||
-                contributor.contributor_details?.last_name ||
-                contributor.contributor_details?.lname;
-
-            const fullName = [first, last].filter(Boolean).join(" ");
+            const fullName = [
+                contributor.user_details?.first_name,
+                contributor.user_details?.last_name,
+            ]
+                .filter(Boolean)
+                .join(" ");
 
             const name =
                 contributor.name ||
@@ -223,7 +524,7 @@ const ActivityPage = ({
 
                         <button
                             className="buttons-primary-reversed"
-                            onClick={onCreateActivity}
+                            onClick={openCreate}
                         >
                             <FiPlusCircle className="buttons-icon" />
                             Nouvelle Activité
@@ -265,13 +566,15 @@ const ActivityPage = ({
                                         <div className={style.avatarWrap}>
                                             <div className={style.nameWrap}>
                                                 <div className={style.name}>
-                                                    <p className="bold">{activity.name || "—"}</p>
+                                                    <p className="bold">
+                                                        {tagParamValueById.get(
+                                                            String(activity.id_param_name))}
+                                                    </p>
                                                 </div>
 
                                                 <div className={style.subName}>
-                                                    {tagParamValueById.get(
-                                                        String(activity.id_param_name)
-                                                    ) || ""}
+
+                                                    {activity.name}
                                                 </div>
                                             </div>
                                         </div>
@@ -285,14 +588,16 @@ const ActivityPage = ({
 
                                     <td className={style.activity}>
                                         <div className={style.projectBadges}>
-                                            {projectNames.slice(0, 2).map((projectName, idx) => (
-                                                <span
-                                                    key={`${projectName}-${idx}`}
-                                                    className={style.projectChip}
-                                                >
-                                                    {projectName}
-                                                </span>
-                                            ))}
+                                            {projectNames
+                                                .slice(0, 2)
+                                                .map((projectName, idx) => (
+                                                    <span
+                                                        key={`${projectName}-${idx}`}
+                                                        className={style.projectChip}
+                                                    >
+                                                        {projectName}
+                                                    </span>
+                                                ))}
 
                                             {projectNames.length > 2 && (
                                                 <span className={style.projectChip}>
@@ -310,27 +615,40 @@ const ActivityPage = ({
                                     <td>
                                         <span
                                             className={
-                                                statusLabelById.get(String(activity.id_status)) ===
-                                                    "Ouvert"
+                                                statusLabelById.get(
+                                                    String(activity.id_status)
+                                                ) === "Ouvert"
                                                     ? "greenTag"
                                                     : "redTag"
                                             }
                                         >
-                                            {statusLabelById.get(String(activity.id_status))}
+                                            {statusLabelById.get(
+                                                String(activity.id_status)
+                                            )}
                                         </span>
                                     </td>
 
                                     <td>
                                         <div className={style.actions}>
-                                            <div>
-                                                <EyesIcon />
-                                            </div>
-
                                             <div
                                                 className="cursorOn"
-                                                onClick={() => onViewActivity(activity.id)}
+                                                onClick={() =>
+                                                    onViewActivity(activity.id)
+                                                }
                                             >
                                                 <GoToIcon />
+                                            </div>
+                                            <div
+                                                className="cursorOn"
+                                                role="button"
+                                                aria-label="Modifier l'activité"
+                                                onClick={() => openEdit(activity)}
+                                            >
+                                                <PenIcon />
+                                            </div>
+
+                                            <div>
+                                                <EyesIcon />
                                             </div>
                                         </div>
                                     </td>
@@ -340,6 +658,264 @@ const ActivityPage = ({
                     </tbody>
                 </table>
             )}
+
+            <Popup
+                open={openPopup}
+                onClose={closePopup}
+                title={isEditMode ? "Modifier l'activité" : "Nouvelle activité"}
+            >
+                <form className={stylePopup.form} onSubmit={handleActivityConfirm}>
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Type d'activité<span>*</span>
+                            </label>
+
+                            <select
+                                className="inputs"
+                                required
+                                value={formValues.id_param_name}
+                                onChange={handleFormChange("id_param_name")}
+                            >
+                                <option value="" disabled hidden>
+                                    Type d'activité
+                                </option>
+
+                                {tagParamOptions.map((tag) => (
+                                    <option key={tag.id} value={tag.id}>
+                                        {tag.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div className={stylePopup.field}>
+                            <label>
+                                Statut<span>*</span>
+                            </label>
+
+                            <select
+                                className="inputs"
+                                required
+                                value={formValues.id_status}
+                                onChange={handleFormChange("id_status")}
+                            >
+                                <option value="" disabled hidden>
+                                    Statut
+                                </option>
+
+                                {statusList.map((status) => (
+                                    <option key={status.id} value={status.id}>
+                                        {status.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Nom de l'activité<span>*</span>
+                            </label>
+
+                            <input
+                                className="inputs"
+                                type="text"
+                                required
+                                placeholder="Nom de l'activité"
+                                value={formValues.name}
+                                onChange={handleFormChange("name")}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>Description</label>
+
+                            <textarea
+                                className="inputs"
+                                placeholder="Description"
+                                value={formValues.description}
+                                onChange={handleFormChange("description")}
+                                rows={4}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Émargement et Évaluation<span>*</span>
+                            </label>
+
+                            <select
+                                className="inputs"
+                                required
+                                value={formValues.emargement_evaluation}
+                                onChange={handleFormChange(
+                                    "emargement_evaluation"
+                                )}
+                            >
+                                <option value="" disabled hidden>
+                                    Émargement et Évaluation
+                                </option>
+                                <option value="none">Aucun</option>
+                                <option value="emargement">
+                                    Émargement uniquement
+                                </option>
+                                <option value="evaluation">
+                                    Évaluation uniquement
+                                </option>
+                                <option value="both">
+                                    Émargement et Évaluation
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Nombre de sessions<span>*</span>
+                            </label>
+
+                            <input
+                                className="inputs"
+                                type="number"
+                                min="1"
+                                required
+                                value={formValues.number_session}
+                                onChange={handleFormChange("number_session")}
+                            />
+                        </div>
+
+                        <div className={stylePopup.field}>
+                            <label>
+                                Durée d'une session<span>*</span>
+                            </label>
+
+                            <select
+                                className="inputs"
+                                required
+                                value={formValues.duration_in_minutes}
+                                onChange={handleFormChange(
+                                    "duration_in_minutes"
+                                )}
+                            >
+                                <option value="" disabled hidden>
+                                    Durée de la session
+                                </option>
+
+                                {durationOptions.map((duration) => (
+                                    <option key={duration.id} value={duration.value}>
+                                        {duration.label}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
+
+                    {!isEditMode && (
+                        <>
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <Multiselect
+                                        label="Affectation Intervenants"
+                                        options={contributorOptions}
+                                        value={formValues.contribs}
+                                        onChange={(value) =>
+                                            setFormValues((prev) => ({
+                                                ...prev,
+                                                contribs: value,
+                                            }))
+                                        }
+                                        placeholder="Sélectionner des intervenants"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <label className="row-flex">
+                                        Ajouter tous les projets affectés au programme
+                                        <input
+                                            type="checkbox"
+                                            checked={formValues.includeAllProgramProjects}
+                                            onChange={handleIncludeAllProgramProjectsChange}
+                                        />
+                                        Oui
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <Multiselect
+                                        label="Affectation Projets"
+                                        options={projectOptions}
+                                        value={formValues.projects}
+                                        onChange={(value) =>
+                                            setFormValues((prev) => ({
+                                                ...prev,
+                                                projects: value,
+                                            }))
+                                        }
+                                        placeholder="Sélectionner des projets"
+                                        disabled={formValues.includeAllProgramProjects}
+                                    />
+                                </div>
+                            </div>
+                            <div className={stylePopup.row}>
+                                <div className={stylePopup.field}>
+                                    <Multiselect
+                                        label="Affectation Projets"
+                                        options={projectOptions}
+                                        value={formValues.projects}
+                                        onChange={(value) =>
+                                            setFormValues((prev) => ({
+                                                ...prev,
+                                                projects: value,
+                                            }))
+                                        }
+                                        placeholder="Sélectionner des projets"
+                                        disabled={formValues.includeAllProgramProjects}
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <label>
+                                Autoriser les participants à planifier des sessions
+                                <span>*</span>
+                            </label>
+
+                            <select
+                                className="inputs"
+                                required
+                                value={formValues.is_planable}
+                                onChange={handleFormChange("is_planable")}
+                            >
+                                <option value="false">non</option>
+                                <option value="true">oui</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <button
+                        id="btnCreateActivity"
+                        type="submit"
+                        className={`${stylePopup.submitBtn} buttons-primary`}
+                        onClick={() => avoidDoubleClicks("btnCreateActivity")}
+                    >
+                        {isEditMode ? "Modifier" : "Créer"}
+                    </button>
+                </form>
+            </Popup>
         </div>
     );
 };

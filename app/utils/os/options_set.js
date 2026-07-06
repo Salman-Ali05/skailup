@@ -1,0 +1,1 @@
+// later to do, it'll retreive every single OS from the backend then it'll be used in the app everywhere

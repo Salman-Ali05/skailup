@@ -10,6 +10,7 @@ export default function Multiselect({
     value = [],
     onChange,
     placeholder = "Sélectionner",
+    disabled = false,
 }) {
     const [open, setOpen] = useState(false);
     const wrapperRef = useRef(null);
@@ -26,6 +27,8 @@ export default function Multiselect({
     }, []);
 
     const toggleValue = (id) => {
+        if (disabled) return;
+
         if (value.includes(id)) {
             onChange(value.filter((v) => v !== id));
         } else {
@@ -35,7 +38,8 @@ export default function Multiselect({
 
     const selectedLabels = options
         .filter((option) => value.includes(option.id))
-        .map((option) => option.lang_fr);
+        .map((option) => option.lang_fr || option.label || option.name)
+        .filter(Boolean);
 
     const selectedCount = value.length;
 
@@ -49,9 +53,20 @@ export default function Multiselect({
             <button
                 type="button"
                 className={styles.trigger}
-                onClick={() => setOpen((prev) => !prev)}
+                onClick={() => {
+                    if (!disabled) {
+                        setOpen((prev) => !prev);
+                    }
+                }}
+                disabled={disabled}
             >
-                <span className={selectedLabels.length ? styles.selectedText : styles.placeholder}>
+                <span
+                    className={
+                        selectedLabels.length
+                            ? styles.selectedText
+                            : styles.placeholder
+                    }
+                >
                     {selectedLabels.length > 0
                         ? selectedLabels.join(", ")
                         : placeholder}
@@ -77,7 +92,9 @@ export default function Multiselect({
                                     checked={value.includes(option.id)}
                                     onChange={() => toggleValue(option.id)}
                                 />
-                                <span>{option.lang_fr}</span>
+                                <span>
+                                    {option.lang_fr || option.label || option.name}
+                                </span>
                             </label>
                         ))
                     )}
