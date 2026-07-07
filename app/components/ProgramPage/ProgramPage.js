@@ -21,11 +21,23 @@ const ProgramPage = ({
     contributors = [],
     tagParamStructures = [],
     statusOptions = [],
+
+    activeStatusId = "",
+    statusCounts = {
+        open: 0,
+        closed: 0,
+        byId: {},
+    },
+
+    filters = {},
+    onStatusChange = () => { },
+    onFiltersChange = () => { },
+    onClearFilters = () => { },
+
     onViewProgram,
     onEditProgram = () => { },
     onCreateProgram = () => { },
 }) => {
-    const [activeStatusId, setActiveStatusId] = useState("");
     const [openPopup, setOpenPopup] = useState(false);
     const [popupMode, setPopupMode] = useState("create");
     const [formValues, setFormValues] = React.useState({
@@ -60,24 +72,8 @@ const ProgramPage = ({
             });
     }, [status, statusOptions]);
 
-    useEffect(() => {
-        if (!activeStatusId && statusList.length > 0) {
-            setActiveStatusId(statusList[0].id);
-        }
-    }, [activeStatusId, statusList]);
-
-    const filteredPrograms = useMemo(() => {
-        if (!activeStatusId) return programs;
-
-        return programs.filter((program) => {
-            return String(program.id_status) === String(activeStatusId);
-        });
-    }, [programs, activeStatusId]);
-
     const getProgramCountByStatus = (statusId) => {
-        return programs.filter((program) => {
-            return String(program.id_status) === String(statusId);
-        }).length;
+        return statusCounts?.byId?.[String(statusId)] ?? 0;
     };
 
     const isEditMode = popupMode === "edit";
@@ -263,7 +259,7 @@ const ProgramPage = ({
                             <div
                                 key={item.id}
                                 className={`tab ${activeStatusId === item.id ? "tabActive" : ""}`}
-                                onClick={() => setActiveStatusId(item.id)}
+                                onClick={() => onStatusChange(item.id)}
                             >
                                 <p>
                                     {item.label} <span>({getProgramCountByStatus(item.id)})</span>
@@ -283,7 +279,7 @@ const ProgramPage = ({
                 </div>
             </div>
 
-            {filteredPrograms.length === 0 ? (
+            {programs.length === 0 ? (
 
                 <NoItem
                     message="Aucun programme trouvé"
@@ -305,7 +301,7 @@ const ProgramPage = ({
                     </thead>
 
                     <tbody>
-                        {filteredPrograms.map((program) => {
+                        {programs.map((program) => {
                             return (
                                 <tr key={program.id}>
                                     <td>
