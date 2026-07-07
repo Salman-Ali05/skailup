@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import { FiPlusCircle } from "react-icons/fi";
+import { FiPlusCircle, FiUsers } from "react-icons/fi";
 import style from "./ActivityPage.module.css";
 import FilterContributors from "@/app/components/Filters/FilterContributors/FilterContributor";
 import ListUsersInSession from "@/app/components/ListUsers/ListUsers";
@@ -31,11 +31,19 @@ const ActivityPage = ({
     onViewActivity,
     onCreateActivity = () => { },
     onEditActivity = () => { },
-    durationOptionsSet = []
+    durationOptionsSet = [],
+    programProjects = [],
+    availableProgramProjects = [],
+    onAddProjectsToProgram = async () => false,
+    onRefreshProgramProjects = async () => { },
 }) => {
     const [activeStatusId, setActiveStatusId] = useState("");
     const [openPopup, setOpenPopup] = useState(false);
     const [popupMode, setPopupMode] = useState("create");
+    const [openManageProjectsPopup, setOpenManageProjectsPopup] = useState(false);
+    const [openAssignProjectsPopup, setOpenAssignProjectsPopup] = useState(false);
+    const [selectedProgramProjectIds, setSelectedProgramProjectIds] = useState([]);
+    const [isAddingProjects, setIsAddingProjects] = useState(false);
 
     const [formValues, setFormValues] = useState({
         id: "",
@@ -185,16 +193,39 @@ const ActivityPage = ({
             });
     }, [contributors]);
 
+    const getProjectUserName = (project) => {
+        const user = project?.user || project?.user_details;
+
+        return [
+            user?.first_name || user?.fname,
+            user?.last_name || user?.lname,
+        ]
+            .filter(Boolean)
+            .join(" ");
+    };
+
+    const getProjectUserPhone = (project) => {
+        const user = project?.user || project?.user_details;
+
+        return (
+            user?.phone ||
+            user?.phone_number ||
+            user?.mobile ||
+            "-"
+        );
+    };
+
+    const getProjectUserEmail = (project) => {
+        const user = project?.user || project?.user_details;
+
+        return user?.email || project?.email || "-";
+    };
+
     const projectOptions = useMemo(() => {
-        return projects
+        return programProjects
             .filter((project) => project && project.id)
             .map((project) => {
-                const userName = [
-                    project.user?.first_name || project.user_details?.first_name,
-                    project.user?.last_name || project.user_details?.last_name,
-                ]
-                    .filter(Boolean)
-                    .join(" ");
+                const userName = getProjectUserName(project);
 
                 const label = [
                     project.name,
@@ -208,7 +239,27 @@ const ActivityPage = ({
                     lang_fr: label || "-",
                 };
             });
-    }, [projects]);
+    }, [programProjects]);
+
+    const availableProjectOptions = useMemo(() => {
+        return availableProgramProjects
+            .filter((project) => project && project.id)
+            .map((project) => {
+                const userName = getProjectUserName(project);
+
+                const label = [
+                    project.name,
+                    userName,
+                ]
+                    .filter(Boolean)
+                    .join(" - ");
+
+                return {
+                    id: String(project.id),
+                    lang_fr: label || "-",
+                };
+            });
+    }, [availableProgramProjects]);
 
     const getEmptyForm = () => ({
         id: "",
@@ -493,6 +544,47 @@ const ActivityPage = ({
         .filter(Boolean)
         .join(" - ");
 
+    const openManageProjects = async () => {
+        await onRefreshProgramProjects();
+        setOpenManageProjectsPopup(true);
+    };
+
+    const closeManageProjects = () => {
+        setOpenManageProjectsPopup(false);
+        setOpenAssignProjectsPopup(false);
+        setSelectedProgramProjectIds([]);
+    };
+
+    const openAssignProjects = () => {
+        setSelectedProgramProjectIds([]);
+        setOpenAssignProjectsPopup(true);
+    };
+
+    const closeAssignProjects = () => {
+        setOpenAssignProjectsPopup(false);
+        setSelectedProgramProjectIds([]);
+    };
+
+    const handleAssignProjects = async (event) => {
+        event.preventDefault();
+
+        if (selectedProgramProjectIds.length === 0) return;
+
+        setIsAddingProjects(true);
+
+        try {
+            const success = await onAddProjectsToProgram(
+                selectedProgramProjectIds
+            );
+
+            if (success) {
+                closeAssignProjects();
+            }
+        } finally {
+            setIsAddingProjects(false);
+        }
+    };
+
     return (
         <div className={style["structure-content"]}>
             <div className="cursorOn" onClick={onBack}>
@@ -521,7 +613,14 @@ const ActivityPage = ({
 
                     <div className={style.tools}>
                         <FilterContributors />
-
+                        <button
+                            type="button"
+                            className="buttons-primary-reversed"
+                            onClick={openManageProjects}
+                        >
+                            <FiUsers className="buttons-icon" />
+                            Gérer les projets
+                        </button>
                         <button
                             className="buttons-primary-reversed"
                             onClick={openCreate}
@@ -913,6 +1012,116 @@ const ActivityPage = ({
                         onClick={() => avoidDoubleClicks("btnCreateActivity")}
                     >
                         {isEditMode ? "Modifier" : "Créer"}
+                    </button>
+                </form>
+            </Popup>
+
+            <Popup
+                open={openManageProjectsPopup}
+                onClose={closeManageProjects}
+                title="Gérer les projets"
+            >
+                <div className={style.manageProjectsContent}>
+                    <div className={style.manageProjectsTop}>
+                        <div>
+                            <p className={style.manageProjectsSubtitle}>
+                                Ajoutez des projets au programme.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            className="buttons-primary"
+                            onClick={openAssignProjects}
+                            disabled={availableProgramProjects.length === 0}
+                        >
+                            <FiPlusCircle className="buttons-icon" />
+                            Affecter un projet
+                        </button>
+                    </div>
+
+                    {programProjects.length === 0 ? (
+                        <NoItem
+                            message="Aucun projet affecté"
+                            subMessage="Affectez un premier projet à ce programme."
+                        />
+                    ) : (
+                        <div className={style.manageProjectsTableWrapper}>
+                            <table className={style.manageProjectsTable}>
+                                <thead>
+                                    <tr>
+                                        <th>Projet</th>
+                                        <th>Participant</th>
+                                        <th>Téléphone</th>
+                                        <th>Mail</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {programProjects.map((project) => (
+                                        <tr key={project.id}>
+                                            <td>{project.name || "-"}</td>
+
+                                            <td>
+                                                {getProjectUserName(project) || "-"}
+                                            </td>
+
+                                            <td>
+                                                {getProjectUserPhone(project)}
+                                            </td>
+
+                                            <td>
+                                                {getProjectUserEmail(project)}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            </Popup>
+
+            <Popup
+                open={openAssignProjectsPopup}
+                onClose={closeAssignProjects}
+                title="Affectation des projets"
+            >
+                <form
+                    className={stylePopup.form}
+                    onSubmit={handleAssignProjects}
+                >
+                    <div className={stylePopup.row}>
+                        <div className={stylePopup.field}>
+                            <Multiselect
+                                label="Projets"
+                                required
+                                options={availableProjectOptions}
+                                value={selectedProgramProjectIds}
+                                onChange={setSelectedProgramProjectIds}
+                                placeholder="Sélectionner des projets"
+                            />
+                        </div>
+                    </div>
+
+                    {availableProjectOptions.length === 0 && (
+                        <p className={style.noAvailableProject}>
+                            Tous les projets de la structure sont déjà affectés
+                            à ce programme.
+                        </p>
+                    )}
+
+                    <button
+                        type="submit"
+                        className={`${stylePopup.submitBtn} buttons-primary`}
+                        disabled={
+                            isAddingProjects ||
+                            selectedProgramProjectIds.length === 0
+                        }
+                    >
+                        {isAddingProjects
+                            ? "Ajout en cours..."
+                            : "Ajouter"}
                     </button>
                 </form>
             </Popup>

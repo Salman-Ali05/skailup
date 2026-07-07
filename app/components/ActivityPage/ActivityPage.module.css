@@ -75,3 +75,86 @@
     flex-direction: column;
     gap: 2px;
 }
+
+.manageProjectsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+}
+
+.manageProjectsTop {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.manageProjectsSubtitle {
+    margin: 0;
+    color: #737373;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.manageProjectsTableWrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.manageProjectsTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.manageProjectsTable thead {
+    background: #f5f6f8;
+}
+
+.manageProjectsTable th,
+.manageProjectsTable td {
+    padding: 16px 14px;
+    text-align: left;
+    font-size: 14px;
+}
+
+.manageProjectsTable th {
+    font-weight: 600;
+    color: #171717;
+}
+
+.manageProjectsTable th:first-child {
+    border-radius: 12px 0 0 12px;
+}
+
+.manageProjectsTable th:last-child {
+    border-radius: 0 12px 12px 0;
+}
+
+.manageProjectsTable td {
+    border-bottom: 1px solid #eeeeee;
+    color: #262626;
+}
+
+.noAvailableProject {
+    margin: 0;
+    color: #737373;
+    font-size: 14px;
+    text-align: center;
+}
+
+@media (max-width: 760px) {
+    .manageProjectsTop {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .manageProjectsTop button {
+        width: 100%;
+    }
+
+    .manageProjectsTable {
+        min-width: 720px;
+    }
+}
