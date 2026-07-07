@@ -84,10 +84,10 @@ const LoginPage = () => {
             </div>
 
             <div className={styles["connection-form"]}>
-                <div className={styles["shuffle-form"]}>
+                {/* <div className={styles["shuffle-form"]}>
                     <button type="submit" className="buttons-primary" onClick={() => routeTo("/login")}>Se connecter</button>
                     <button type="submit" className="buttons-unselected" onClick={() => routeTo('/register')}>S'inscrire</button>
-                </div>
+                </div> */}
                 <form className="forms" onSubmit={onSubmit}>
                     <h2 className={styles["log-title"]}>Connexion</h2>
 
