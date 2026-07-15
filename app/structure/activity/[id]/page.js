@@ -1,12 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import { useParams } from "next/navigation";
 import { showToast } from "nextjs-toast-notify";
 import { useRouteTo } from "@/app/utils/router";
 import style from "./actitvity.module.css";
 import ActivityPage from "@/app/components/ActivityPage/ActivityPage";
 import { useUser } from "@/app/utils/contexts/userContext";
+import useOptionsSet from "@/app/utils/os/options_set";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -15,38 +20,91 @@ const StructureActivity = () => {
     const params = useParams();
     const { id } = params || {};
 
-    const { loading, isAuthenticated, authFetch } = useUser();
+    const {
+        loading,
+        isAuthenticated,
+        authFetch,
+    } = useUser();
+
+    const {
+        optionsSet,
+        optionsLoading,
+        optionsError,
+    } = useOptionsSet();
+
+    /*
+     * Statuts autorisés pour les activités.
+     */
+    const activityStatusOptions = useMemo(() => {
+        const statuses = Array.isArray(optionsSet?.os_status)
+            ? optionsSet.os_status
+            : [];
+
+        return statuses.filter((status) => {
+            return ["Open", "Closed"].includes(status.code);
+        });
+    }, [optionsSet]);
+
+    /*
+     * Durées disponibles pour une session.
+     */
+    const durationOptionsSet = useMemo(() => {
+        return Array.isArray(
+            optionsSet?.os_activity_duration
+        )
+            ? optionsSet.os_activity_duration
+            : [];
+    }, [optionsSet]);
+
+    /*
+     * Types de paramètres :
+     * Activities, Programs, etc.
+     */
+    const tagParamTypes = useMemo(() => {
+        return Array.isArray(optionsSet?.os_tag_params)
+            ? optionsSet.os_tag_params
+            : [];
+    }, [optionsSet]);
 
     const [program, setProgram] = useState(null);
 
     const [activities, setActivities] = useState([]);
-    const [activityProjects, setActivityProjects] = useState([]);
+    const [activityProjects, setActivityProjects] =
+        useState([]);
     const [projects, setProjects] = useState([]);
 
-    const [activityContribs, setActivityContribs] = useState([]);
-    const [contributors, setContributors] = useState([]);
-
-    const [tagParamStructures, setTagParamStructures] = useState([]);
-    const [tagParamTypes, setTagParamTypes] = useState([]);
-
-    const [statusOptions, setStatusOptions] = useState([]);
-    const [status, setStatus] = useState([]);
-
-    const [durationOptionsSet, setDurationOptionsSet] = useState([]);
-
-    const [programProjects, setProgramProjects] = useState([]);
-    const [availableProgramProjects, setAvailableProgramProjects] =
+    const [activityContribs, setActivityContribs] =
+        useState([]);
+    const [contributors, setContributors] =
         useState([]);
 
+    const [
+        tagParamStructures,
+        setTagParamStructures,
+    ] = useState([]);
+
+    const [programProjects, setProgramProjects] =
+        useState([]);
+
+    const [
+        availableProgramProjects,
+        setAvailableProgramProjects,
+    ] = useState([]);
+
     useEffect(() => {
-        const storedProgram = sessionStorage.getItem("selectedProgram");
+        const storedProgram =
+            sessionStorage.getItem("selectedProgram");
 
         if (!storedProgram) return;
 
         try {
-            const parsedProgram = JSON.parse(storedProgram);
+            const parsedProgram =
+                JSON.parse(storedProgram);
 
-            if (String(parsedProgram.id) === String(id)) {
+            if (
+                String(parsedProgram.id) ===
+                String(id)
+            ) {
                 setProgram(parsedProgram);
             }
         } catch (err) {
@@ -57,74 +115,21 @@ const StructureActivity = () => {
         }
     }, [id]);
 
-    const normalizeOsResponse = (data) => {
-        if (Array.isArray(data)) return data;
-        if (Array.isArray(data?.code)) return data.code;
-        if (Array.isArray(data?.data)) return data.data;
-        return [];
-    };
+    /*
+     * Gestion de l'erreur du fichier global OS.
+     */
+    useEffect(() => {
+        if (!optionsError) return;
 
-    const fetchStatus = async () => {
-        try {
-            const res = await authFetch(
-                `${API_URL}/os_tags/os_status`,
-                {
-                    method: "GET",
-                }
-            );
+        console.error(
+            "Impossible de charger les options sets :",
+            optionsError
+        );
 
-            const data = await res.json().catch(() => []);
-
-            if (!res.ok) {
-                throw new Error(
-                    data?.error ||
-                    "Impossible de charger les statuts"
-                );
-            }
-
-            const statusData = normalizeOsResponse(data);
-
-            const allowedStatus = statusData.filter((item) => {
-                return ["Open", "Closed"].includes(item.code);
-            });
-
-            setStatus(allowedStatus);
-        } catch (err) {
-            console.error(err);
-            showToast.error(
-                "Impossible de charger la liste des statuts"
-            );
-        }
-    };
-
-    const fetchActivityDurations = async () => {
-        try {
-            const res = await authFetch(
-                `${API_URL}/os_tags/os_activity_duration`,
-                {
-                    method: "GET",
-                }
-            );
-
-            const data = await res.json().catch(() => []);
-
-            if (!res.ok) {
-                throw new Error(
-                    data?.error ||
-                    "Impossible de charger les durées d'activité"
-                );
-            }
-
-            setDurationOptionsSet(normalizeOsResponse(data));
-        } catch (err) {
-            console.error(err);
-            setDurationOptionsSet([]);
-
-            showToast.error(
-                "Impossible de charger la liste des durées"
-            );
-        }
-    };
+        showToast.error(
+            "Impossible de charger les options de l'application"
+        );
+    }, [optionsError]);
 
     const fetchActivities = async () => {
         try {
@@ -135,7 +140,9 @@ const StructureActivity = () => {
                 }
             );
 
-            const data = await res.json().catch(() => ({}));
+            const data = await res
+                .json()
+                .catch(() => ({}));
 
             if (!res.ok) {
                 throw new Error(
@@ -145,18 +152,60 @@ const StructureActivity = () => {
             }
 
             setProgram(data?.program || null);
-            setActivities(data?.activities ?? []);
-            setActivityProjects(data?.activityProjects ?? []);
-            setProjects(data?.projects ?? []);
-            setActivityContribs(data?.activityContribs ?? []);
-            setContributors(data?.contributors ?? []);
-            setStatusOptions(data?.statusOptions ?? []);
-            setTagParamStructures(
-                data?.tagParamStructures ?? []
+
+            setActivities(
+                Array.isArray(data?.activities)
+                    ? data.activities
+                    : []
             );
-            setTagParamTypes(data?.tagParamTypes ?? []);
+
+            setActivityProjects(
+                Array.isArray(data?.activityProjects)
+                    ? data.activityProjects
+                    : []
+            );
+
+            setProjects(
+                Array.isArray(data?.projects)
+                    ? data.projects
+                    : []
+            );
+
+            setActivityContribs(
+                Array.isArray(data?.activityContribs)
+                    ? data.activityContribs
+                    : []
+            );
+
+            setContributors(
+                Array.isArray(data?.contributors)
+                    ? data.contributors
+                    : []
+            );
+
+            setTagParamStructures(
+                Array.isArray(data?.tagParamStructures)
+                    ? data.tagParamStructures
+                    : []
+            );
+
+            /*
+             * On n'utilise plus :
+             *
+             * data.statusOptions
+             * data.tagParamTypes
+             *
+             * Ces données viennent maintenant de optionsSet.
+             */
         } catch (err) {
             console.error(err);
+
+            setActivities([]);
+            setActivityProjects([]);
+            setProjects([]);
+            setActivityContribs([]);
+            setContributors([]);
+            setTagParamStructures([]);
 
             showToast.error(
                 "Impossible de charger la liste des activités"
@@ -173,7 +222,9 @@ const StructureActivity = () => {
                 }
             );
 
-            const data = await res.json().catch(() => ({}));
+            const data = await res
+                .json()
+                .catch(() => ({}));
 
             if (!res.ok) {
                 throw new Error(
@@ -213,40 +264,64 @@ const StructureActivity = () => {
         await fetchProgramProjects();
     };
 
+    /*
+     * Les données sont chargées une fois que :
+     * - l'authentification est prête ;
+     * - les options sets sont disponibles ;
+     * - l'ID du programme est disponible.
+     */
     useEffect(() => {
         if (loading) return;
+        if (optionsLoading) return;
         if (!isAuthenticated) return;
         if (!id) return;
 
-        fetchStatus();
-        fetchActivityDurations();
-        refreshActivitiesData();
-        refreshProgramProjectsData();
-    }, [loading, isAuthenticated, id]);
+        Promise.all([
+            refreshActivitiesData(),
+            refreshProgramProjectsData(),
+        ]);
+    }, [
+        loading,
+        optionsLoading,
+        isAuthenticated,
+        id,
+    ]);
 
     const handleViewActivity = (activityId) => {
-        routeTo(`/structure/session/${activityId}`);
+        routeTo(
+            `/structure/session/${activityId}`
+        );
     };
 
-    const handleCreateActivity = async (formValues) => {
+    const handleCreateActivity = async (
+        formValues
+    ) => {
         if (loading || !isAuthenticated) {
             showToast.error(
                 "Session expirée. Veuillez vous reconnecter."
             );
+
             return false;
         }
 
         try {
             const activityPayload = {
                 id_param_name:
-                    Number(formValues.id_param_name) ||
+                    Number(
+                        formValues.id_param_name
+                    ) ||
                     formValues.id_param_name,
 
                 name: formValues.name,
-                description: formValues.description,
 
-                is_sign_needed: formValues.is_sign_needed,
-                is_note_needed: formValues.is_note_needed,
+                description:
+                    formValues.description,
+
+                is_sign_needed:
+                    formValues.is_sign_needed,
+
+                is_note_needed:
+                    formValues.is_note_needed,
 
                 number_session: Number(
                     formValues.number_session
@@ -256,10 +331,14 @@ const StructureActivity = () => {
                     formValues.duration_in_minutes
                 ),
 
-                contribs: formValues.contribs ?? [],
-                projects: formValues.projects ?? [],
+                contribs:
+                    formValues.contribs ?? [],
 
-                is_planable: formValues.is_planable,
+                projects:
+                    formValues.projects ?? [],
+
+                is_planable:
+                    formValues.is_planable,
 
                 id_status:
                     Number(formValues.id_status) ||
@@ -279,11 +358,15 @@ const StructureActivity = () => {
                 `${API_URL}/activities/${id}`,
                 {
                     method: "POST",
-                    body: JSON.stringify(activityPayload),
+                    body: JSON.stringify(
+                        activityPayload
+                    ),
                 }
             );
 
-            const data = await res.json().catch(() => ({}));
+            const data = await res
+                .json()
+                .catch(() => ({}));
 
             if (!res.ok) {
                 throw new Error(
@@ -304,30 +387,44 @@ const StructureActivity = () => {
             return true;
         } catch (err) {
             console.error(err);
-            showToast.error(`Erreur : ${err.message}`);
+
+            showToast.error(
+                `Erreur : ${err.message}`
+            );
+
             return false;
         }
     };
 
-    const handleEditActivity = async (formValues) => {
+    const handleEditActivity = async (
+        formValues
+    ) => {
         if (loading || !isAuthenticated) {
             showToast.error(
                 "Session expirée. Veuillez vous reconnecter."
             );
+
             return false;
         }
 
         try {
             const activityPayload = {
                 id_param_name:
-                    Number(formValues.id_param_name) ||
+                    Number(
+                        formValues.id_param_name
+                    ) ||
                     formValues.id_param_name,
 
                 name: formValues.name,
-                description: formValues.description,
 
-                is_sign_needed: formValues.is_sign_needed,
-                is_note_needed: formValues.is_note_needed,
+                description:
+                    formValues.description,
+
+                is_sign_needed:
+                    formValues.is_sign_needed,
+
+                is_note_needed:
+                    formValues.is_note_needed,
 
                 number_session: Number(
                     formValues.number_session
@@ -337,7 +434,8 @@ const StructureActivity = () => {
                     formValues.duration_in_minutes
                 ),
 
-                is_planable: formValues.is_planable,
+                is_planable:
+                    formValues.is_planable,
 
                 id_status:
                     Number(formValues.id_status) ||
@@ -354,11 +452,15 @@ const StructureActivity = () => {
                 `${API_URL}/activities/${id}/${formValues.id}`,
                 {
                     method: "PUT",
-                    body: JSON.stringify(activityPayload),
+                    body: JSON.stringify(
+                        activityPayload
+                    ),
                 }
             );
 
-            const data = await res.json().catch(() => ({}));
+            const data = await res
+                .json()
+                .catch(() => ({}));
 
             if (!res.ok) {
                 throw new Error(
@@ -376,12 +478,18 @@ const StructureActivity = () => {
             return true;
         } catch (err) {
             console.error(err);
-            showToast.error(`Erreur : ${err.message}`);
+
+            showToast.error(
+                `Erreur : ${err.message}`
+            );
+
             return false;
         }
     };
 
-    const handleAddProjectsToProgram = async (projectIds) => {
+    const handleAddProjectsToProgram = async (
+        projectIds
+    ) => {
         if (loading || !isAuthenticated) {
             showToast.error(
                 "Session expirée. Veuillez vous reconnecter."
@@ -390,7 +498,10 @@ const StructureActivity = () => {
             return false;
         }
 
-        if (!Array.isArray(projectIds) || projectIds.length === 0) {
+        if (
+            !Array.isArray(projectIds) ||
+            projectIds.length === 0
+        ) {
             showToast.error(
                 "Sélectionnez au moins un projet."
             );
@@ -409,7 +520,9 @@ const StructureActivity = () => {
                 }
             );
 
-            const data = await res.json().catch(() => ({}));
+            const data = await res
+                .json()
+                .catch(() => ({}));
 
             if (!res.ok) {
                 throw new Error(
@@ -429,40 +542,108 @@ const StructureActivity = () => {
             return true;
         } catch (err) {
             console.error(err);
-            showToast.error(`Erreur : ${err.message}`);
+
+            showToast.error(
+                `Erreur : ${err.message}`
+            );
+
             return false;
         }
     };
 
+    if (optionsLoading) {
+        return (
+            <div
+                className={
+                    style["structure-layout"]
+                }
+            >
+                <div
+                    className={
+                        style["structure-main"]
+                    }
+                >
+                    <p>
+                        Chargement des options...
+                    </p>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className={style["structure-layout"]}>
-            <div className={style["structure-main"]}>
+        <div
+            className={
+                style["structure-layout"]
+            }
+        >
+            <div
+                className={
+                    style["structure-main"]
+                }
+            >
                 <ActivityPage
                     programId={id}
                     program={program}
-                    status={status}
-                    statusOptions={statusOptions}
+
+                    /*
+                     * Les OS viennent maintenant
+                     * du fichier global.
+                     */
+                    status={
+                        activityStatusOptions
+                    }
+                    durationOptionsSet={
+                        durationOptionsSet
+                    }
+                    tagParamTypes={
+                        tagParamTypes
+                    }
+
                     activities={activities}
-                    activityProjects={activityProjects}
+                    activityProjects={
+                        activityProjects
+                    }
                     projects={projects}
-                    activityContribs={activityContribs}
-                    contributors={contributors}
-                    tagParamStructures={tagParamStructures}
-                    tagParamTypes={tagParamTypes}
-                    durationOptionsSet={durationOptionsSet}
-                    programProjects={programProjects}
+                    activityContribs={
+                        activityContribs
+                    }
+                    contributors={
+                        contributors
+                    }
+                    tagParamStructures={
+                        tagParamStructures
+                    }
+
+                    programProjects={
+                        programProjects
+                    }
                     availableProgramProjects={
                         availableProgramProjects
                     }
+
                     onBack={() =>
-                        routeTo("/structure/program")
+                        routeTo(
+                            "/structure/program"
+                        )
                     }
-                    onViewActivity={handleViewActivity}
-                    onCreateActivity={handleCreateActivity}
-                    onEditActivity={handleEditActivity}
+
+                    onViewActivity={
+                        handleViewActivity
+                    }
+
+                    onCreateActivity={
+                        handleCreateActivity
+                    }
+
+                    onEditActivity={
+                        handleEditActivity
+                    }
+
                     onAddProjectsToProgram={
                         handleAddProjectsToProgram
                     }
+
                     onRefreshProgramProjects={
                         refreshProgramProjectsData
                     }

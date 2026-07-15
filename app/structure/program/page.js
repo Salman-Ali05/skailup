@@ -1,11 +1,12 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { showToast } from "nextjs-toast-notify";
 import style from "./programs.module.css";
 import ProgramPage from "@/app/components/ProgramPage/ProgramPage";
 import { useUser } from "@/app/utils/contexts/userContext";
+import useOptionsSet from "@/app/utils/os/options_set";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
@@ -18,37 +19,57 @@ const StructurePrograms = () => {
         authFetch,
     } = useUser();
 
-    // later, we'll use the os in the utilis folder 
-    const openStatusId = "a71fd9fe-5def-49da-90f1-ef3bee535906";
-    const closedStatusId = "1d85343e-5bb8-4f71-b3c4-2e9f23e157a2";
+    const {
+        optionsSet,
+        optionsLoading,
+        optionsError,
+    } = useOptionsSet();
 
-    const [activeStatusId, setActiveStatusId] =
-        useState(openStatusId);
+    const programStatusOptions = useMemo(() => {
+        const statuses = Array.isArray(optionsSet?.os_status)
+            ? optionsSet.os_status
+            : [];
+
+        return statuses.filter((status) => {
+            return ["Open", "Closed"].includes(status.code);
+        });
+    }, [optionsSet]);
+
+    const tagParamTypes = useMemo(() => {
+        return Array.isArray(optionsSet?.os_tag_params)
+            ? optionsSet.os_tag_params
+            : [];
+    }, [optionsSet]);
+
+    const openStatusId = useMemo(() => {
+        return programStatusOptions.find((status) => {
+            return status.code === "Open";
+        })?.id;
+    }, [programStatusOptions]);
+
+    const closedStatusId = useMemo(() => {
+        return programStatusOptions.find((status) => {
+            return status.code === "Closed";
+        })?.id;
+    }, [programStatusOptions]);
+
+    const [activeStatusId, setActiveStatusId] = useState("");
 
     const [programs, setPrograms] = useState([]);
     const [programProjects, setProgramProjects] = useState([]);
     const [projects, setProjects] = useState([]);
-    const [programContributors, setProgramContributors] = useState([]);
+    const [programContributors, setProgramContributors] =
+        useState([]);
     const [contributors, setContributors] = useState([]);
-    const [tagParamStructures, setTagParamStructures] = useState([]);
-    const [statusOptions, setStatusOptions] = useState([]);
-    const [status, setStatus] = useState([]);
+    const [tagParamStructures, setTagParamStructures] =
+        useState([]);
 
     const [statusCounts, setStatusCounts] = useState({
         open: 0,
         closed: 0,
-        byId: {
-            [openStatusId]: 0,
-            [closedStatusId]: 0,
-        },
+        byId: {},
     });
 
-    /*
-     * Prévu pour les futurs filtres.
-     *
-     * programName = nom du tag programme
-     * cohortName = description de la cohorte
-     */
     const [filters, setFilters] = useState({
         programName: "",
         cohortName: "",
@@ -56,6 +77,39 @@ const StructurePrograms = () => {
         projectId: "",
         activityId: "",
     });
+
+    useEffect(() => {
+        if (!openStatusId) return;
+
+        setActiveStatusId((currentStatusId) => {
+            const currentStatusStillExists =
+                programStatusOptions.some((status) => {
+                    return (
+                        String(status.id) ===
+                        String(currentStatusId)
+                    );
+                });
+
+            if (currentStatusStillExists) {
+                return currentStatusId;
+            }
+
+            return String(openStatusId);
+        });
+    }, [openStatusId, programStatusOptions]);
+
+    useEffect(() => {
+        if (!optionsError) return;
+
+        console.error(
+            "Impossible de charger les options sets :",
+            optionsError
+        );
+
+        showToast.error(
+            "Impossible de charger les options de l'application"
+        );
+    }, [optionsError]);
 
     const handleViewProgram = (program) => {
         sessionStorage.setItem(
@@ -66,54 +120,17 @@ const StructurePrograms = () => {
         router.push(`/structure/activity/${program.id}`);
     };
 
-    const fetchStatus = async () => {
-        try {
-            const res = await authFetch(
-                `${API_URL}/os_tags/os_status`,
-                {
-                    method: "GET",
-                }
-            );
-
-            const data = await res.json();
-
-            const statusData = Array.isArray(data)
-                ? data
-                : Array.isArray(data?.code)
-                    ? data.code
-                    : [];
-
-            const allowedStatus = statusData.filter((item) => {
-                return ["Open", "Closed"].includes(item.code);
-            });
-
-            setStatus(allowedStatus);
-        } catch (err) {
-            console.error(err);
-
-            showToast.error(
-                "Impossible de charger la liste des statuts"
-            );
-        }
-    };
-
     const fetchPrograms = async () => {
+        if (!activeStatusId) return;
+
         try {
             const queryParams = new URLSearchParams();
 
-            /*
-             * L’onglet actif est toujours envoyé au backend.
-             */
-            if (activeStatusId) {
-                queryParams.set(
-                    "statusId",
-                    activeStatusId
-                );
-            }
+            queryParams.set(
+                "statusId",
+                String(activeStatusId)
+            );
 
-            /*
-             * Filtres facultatifs.
-             */
             if (filters.programName.trim()) {
                 queryParams.set(
                     "programName",
@@ -151,13 +168,12 @@ const StructurePrograms = () => {
 
             const queryString = queryParams.toString();
 
-            const url = queryString
-                ? `${API_URL}/programs?${queryString}`
-                : `${API_URL}/programs`;
-
-            const res = await authFetch(url, {
-                method: "GET",
-            });
+            const res = await authFetch(
+                `${API_URL}/programs?${queryString}`,
+                {
+                    method: "GET",
+                }
+            );
 
             const data = await res
                 .json()
@@ -194,12 +210,6 @@ const StructurePrograms = () => {
                     : []
             );
 
-            setStatusOptions(
-                Array.isArray(data?.statusOptions)
-                    ? data.statusOptions
-                    : []
-            );
-
             setTagParamStructures(
                 Array.isArray(data?.tagParamStructures)
                     ? data.tagParamStructures
@@ -215,9 +225,19 @@ const StructurePrograms = () => {
             setStatusCounts({
                 open: data?.statusCounts?.open ?? 0,
                 closed: data?.statusCounts?.closed ?? 0,
+
                 byId: data?.statusCounts?.byId ?? {
-                    [openStatusId]: 0,
-                    [closedStatusId]: 0,
+                    ...(openStatusId
+                        ? {
+                            [String(openStatusId)]: 0,
+                        }
+                        : {}),
+
+                    ...(closedStatusId
+                        ? {
+                            [String(closedStatusId)]: 0,
+                        }
+                        : {}),
                 },
             });
         } catch (err) {
@@ -240,28 +260,21 @@ const StructurePrograms = () => {
     };
 
     /*
-     * Chargement initial des statuts.
+     * Les programmes sont récupérés uniquement quand :
+     * - l'utilisateur est authentifié ;
+     * - les OS sont chargés ;
+     * - l'onglet actif possède un ID.
      */
     useEffect(() => {
         if (loading) return;
-        if (!isAuthenticated) return;
-
-        fetchStatus();
-    }, [loading, isAuthenticated]);
-
-    /*
-     * Nouveau chargement des programmes dès que :
-     * - l’onglet change ;
-     * - un filtre change.
-     */
-    useEffect(() => {
-        if (loading) return;
+        if (optionsLoading) return;
         if (!isAuthenticated) return;
         if (!activeStatusId) return;
 
         refreshProgramsData();
     }, [
         loading,
+        optionsLoading,
         isAuthenticated,
         activeStatusId,
         filters.programName,
@@ -272,12 +285,14 @@ const StructurePrograms = () => {
     ]);
 
     const handleStatusChange = (statusId) => {
+        if (!statusId) return;
+
         setActiveStatusId(String(statusId));
     };
 
     const handleFiltersChange = (nextFilters) => {
-        setFilters((prev) => ({
-            ...prev,
+        setFilters((previousFilters) => ({
+            ...previousFilters,
             ...nextFilters,
         }));
     };
@@ -298,7 +313,7 @@ const StructurePrograms = () => {
                 "Session expirée. Veuillez vous reconnecter."
             );
 
-            return;
+            return false;
         }
 
         try {
@@ -307,14 +322,9 @@ const StructurePrograms = () => {
                     Number(formValues.id_param_structure) ||
                     formValues.id_param_structure,
 
-                description:
-                    formValues.description,
-
-                date_start:
-                    formValues.date_start,
-
-                date_end:
-                    formValues.date_end,
+                description: formValues.description,
+                date_start: formValues.date_start,
+                date_end: formValues.date_end,
 
                 id_status:
                     Number(formValues.id_status) ||
@@ -344,19 +354,17 @@ const StructurePrograms = () => {
                 "Programme créé avec succès"
             );
 
-            /*
-             * Si le programme créé appartient à l’onglet actif,
-             * il apparaîtra après le refresh.
-             *
-             * Les compteurs seront également recalculés.
-             */
             await refreshProgramsData();
+
+            return true;
         } catch (err) {
             console.error(err);
 
             showToast.error(
                 `Erreur : ${err.message}`
             );
+
+            return false;
         }
     };
 
@@ -366,7 +374,7 @@ const StructurePrograms = () => {
                 "Session expirée. Veuillez vous reconnecter."
             );
 
-            return;
+            return false;
         }
 
         try {
@@ -375,14 +383,9 @@ const StructurePrograms = () => {
                     Number(formValues.id_param_structure) ||
                     formValues.id_param_structure,
 
-                description:
-                    formValues.description,
-
-                date_start:
-                    formValues.date_start,
-
-                date_end:
-                    formValues.date_end,
+                description: formValues.description,
+                date_start: formValues.date_start,
+                date_end: formValues.date_end,
 
                 id_status:
                     Number(formValues.id_status) ||
@@ -412,43 +415,45 @@ const StructurePrograms = () => {
                 "Programme modifié avec succès"
             );
 
-            /*
-             * Si le statut a changé, le programme peut disparaître
-             * de l’onglet courant et le compteur de l’autre onglet
-             * sera mis à jour.
-             */
             await refreshProgramsData();
+
+            return true;
         } catch (err) {
             console.error(err);
 
             showToast.error(
                 `Erreur : ${err.message}`
             );
+
+            return false;
         }
     };
+
+    if (optionsLoading) {
+        return (
+            <div className={style["structure-layout"]}>
+                <div className={style["structure-main"]}>
+                    <p>Chargement des options...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className={style["structure-layout"]}>
             <div className={style["structure-main"]}>
                 <ProgramPage
-                    status={status}
-                    statusOptions={statusOptions}
-
+                    status={programStatusOptions}
                     activeStatusId={activeStatusId}
                     statusCounts={statusCounts}
                     onStatusChange={handleStatusChange}
-
-                    filters={filters}
-                    onFiltersChange={handleFiltersChange}
-                    onClearFilters={handleClearFilters}
-
                     programs={programs}
                     programProjects={programProjects}
                     projects={projects}
                     programContributors={programContributors}
                     contributors={contributors}
                     tagParamStructures={tagParamStructures}
-
+                    tagParamTypes={tagParamTypes}
                     onViewProgram={handleViewProgram}
                     onCreateProgram={handleCreateProgram}
                     onEditProgram={handleEditProgram}

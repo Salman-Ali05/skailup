@@ -19,7 +19,6 @@ const ActivityPage = ({
     programId,
     program,
     status = [],
-    statusOptions = [],
     activities = [],
     activityProjects = [],
     projects = [],
@@ -92,10 +91,10 @@ const ActivityPage = ({
     const isEditMode = popupMode === "edit";
 
     const statusList = useMemo(() => {
-        const source = status.length > 0 ? status : statusOptions;
-
-        return source
-            .filter((item) => item && item.id)
+        return status
+            .filter((item) => {
+                return item && item.id;
+            })
             .map((item) => {
                 const label =
                     item.lang_fr ||
@@ -109,10 +108,24 @@ const ActivityPage = ({
 
                 return {
                     id: String(item.id),
+                    code: item.code || "",
                     label,
                 };
             });
-    }, [status, statusOptions]);
+    }, [status]);
+
+    const statusCodeById = useMemo(() => {
+        const map = new Map();
+
+        statusList.forEach((item) => {
+            map.set(
+                String(item.id),
+                item.code
+            );
+        });
+
+        return map;
+    }, [statusList]);
 
     useEffect(() => {
         if (!activeStatusId && statusList.length > 0) {
@@ -712,15 +725,7 @@ const ActivityPage = ({
                                     <td>{activity.missing_actions ?? 0}</td>
 
                                     <td>
-                                        <span
-                                            className={
-                                                statusLabelById.get(
-                                                    String(activity.id_status)
-                                                ) === "Ouvert"
-                                                    ? "greenTag"
-                                                    : "redTag"
-                                            }
-                                        >
+                                        <span className={statusCodeById.get(String(activity.id_status)) === "Open"? "greenTag" : "redTag"}>
                                             {statusLabelById.get(
                                                 String(activity.id_status)
                                             )}
@@ -949,23 +954,6 @@ const ActivityPage = ({
                                 </div>
                             </div>
 
-                            <div className={stylePopup.row}>
-                                <div className={stylePopup.field}>
-                                    <Multiselect
-                                        label="Affectation Projets"
-                                        options={projectOptions}
-                                        value={formValues.projects}
-                                        onChange={(value) =>
-                                            setFormValues((prev) => ({
-                                                ...prev,
-                                                projects: value,
-                                            }))
-                                        }
-                                        placeholder="Sélectionner des projets"
-                                        disabled={formValues.includeAllProgramProjects}
-                                    />
-                                </div>
-                            </div>
                             <div className={stylePopup.row}>
                                 <div className={stylePopup.field}>
                                     <Multiselect

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { FiPlusCircle } from "react-icons/fi";
 import style from "./ProgramPage.module.css";
 import stylePopup from "@/app/components/Popup/PopupContent.module.css";
@@ -14,26 +14,21 @@ import NoItem from "../NoItem/NoItem";
 
 const ProgramPage = ({
     status = [],
+
     programs = [],
     programProjects = [],
     projects = [],
     programContributors = [],
     contributors = [],
     tagParamStructures = [],
-    statusOptions = [],
-
+    tagParamTypes = [],
     activeStatusId = "",
     statusCounts = {
         open: 0,
         closed: 0,
         byId: {},
     },
-
-    filters = {},
     onStatusChange = () => { },
-    onFiltersChange = () => { },
-    onClearFilters = () => { },
-
     onViewProgram,
     onEditProgram = () => { },
     onCreateProgram = () => { },
@@ -50,9 +45,7 @@ const ProgramPage = ({
     });
 
     const statusList = useMemo(() => {
-        const source = status.length > 0 ? status : statusOptions;
-
-        return source
+        return status
             .filter((item) => item && item.id)
             .map((item) => {
                 const label =
@@ -67,10 +60,38 @@ const ProgramPage = ({
 
                 return {
                     id: String(item.id),
+                    code: item.code || "",
                     label,
                 };
             });
-    }, [status, statusOptions]);
+    }, [status]);
+
+    const programTypeParam = useMemo(() => {
+        return tagParamTypes.find((type) => {
+            return (
+                type.code === "Programs" ||
+                type.code === "Program" ||
+                type.lang_fr === "Programmes" ||
+                type.lang_fr === "Programme"
+            );
+        });
+    }, [tagParamTypes]);
+
+    const filteredTagParamStructures = useMemo(() => {
+        if (!programTypeParam?.id) {
+            return [];
+        }
+
+        return tagParamStructures.filter((tag) => {
+            return (
+                String(tag.id_type_param) ===
+                String(programTypeParam.id)
+            );
+        });
+    }, [
+        tagParamStructures,
+        programTypeParam,
+    ]);
 
     const getProgramCountByStatus = (statusId) => {
         return statusCounts?.byId?.[String(statusId)] ?? 0;
@@ -200,13 +221,26 @@ const ProgramPage = ({
 
     const tagParamValueById = useMemo(() => {
         const map = new Map();
-        tagParamStructures.forEach((tag) => {
-            if (!tag || !tag.id) return;
-            const value = tag.label || tag.name || tag.description || tag.tag || tag.value;
-            map.set(tag.id, value || "");
+
+        filteredTagParamStructures.forEach((tag) => {
+            if (!tag?.id) return;
+
+            const value =
+                tag.label ||
+                tag.name ||
+                tag.description ||
+                tag.tag ||
+                tag.value ||
+                "";
+
+            map.set(
+                String(tag.id),
+                value
+            );
         });
+
         return map;
-    }, [tagParamStructures]);
+    }, [filteredTagParamStructures]);
 
     const contributorNameById = useMemo(() => {
         const map = new Map();
@@ -230,13 +264,36 @@ const ProgramPage = ({
     }, [programContributors, contributorNameById]);
 
     const tagParamOptions = useMemo(() => {
-        return tagParamStructures
-            .filter((tag) => tag && tag.id)
+        return filteredTagParamStructures
+            .filter((tag) => tag?.id)
             .map((tag) => {
-                const label = tag.label || tag.name || tag.description || tag.tag || tag.value || "-";
-                return { id: tag.id, label };
+                const label =
+                    tag.label ||
+                    tag.name ||
+                    tag.description ||
+                    tag.tag ||
+                    tag.value ||
+                    "-";
+
+                return {
+                    id: String(tag.id),
+                    label,
+                };
             });
-    }, [tagParamStructures]);
+    }, [filteredTagParamStructures]);
+
+    const statusCodeById = useMemo(() => {
+        const map = new Map();
+
+        statusList.forEach((item) => {
+            map.set(
+                String(item.id),
+                item.code
+            );
+        });
+
+        return map;
+    }, [statusList]);
 
     const statusLabelById = React.useMemo(() => {
         const map = new Map();
@@ -307,7 +364,7 @@ const ProgramPage = ({
                                     <td>
                                         {program.id_param_structure ? (
                                             <span>
-                                                {" "}{tagParamValueById.get(program.id_param_structure)}
+                                                {" "}{tagParamValueById.get(String(program.id_param_structure))}
                                             </span>
                                         ) : null} <br></br>
                                         {program.description}
@@ -326,7 +383,7 @@ const ProgramPage = ({
                                     </td>
 
                                     <td>
-                                        <span className={(statusLabelById.get(String(program.id_status)) === "Ouvert") ? "greenTag" : "redTag"}>
+                                        <span className={statusCodeById.get(String(program.id_status)) === "Open" ? "greenTag" : "redTag"}>
                                             {statusLabelById.get(String(program.id_status))}
                                         </span>
                                     </td>
